@@ -1,0 +1,87 @@
+from scipy.spatial import ConvexHull
+import numpy as np
+from math import sqrt
+
+AllPoints = []
+CnvxPolyBndPnts = []
+
+n=10 # number of points
+N=25 # +/- range [input should be even] of points 
+ 
+while len(AllPoints) < n:
+  points = (float(np.random.randint(-N,N)),float(np.random.randint(-N,N)))
+  AllPoints.append(points)
+# creates list of random points {couldn't use For Loop because randomness didn't work}
+ 
+print("AllPoints:", AllPoints,"\n"*2)
+ 
+hull = ConvexHull(AllPoints)
+
+Outer_Pts = [AllPoints[i] for i in hull.vertices]
+Inner_Pts = [x for x in AllPoints if x not in Outer_Pts]
+
+print("OUT:",Outer_Pts,"\n"*2)
+print("IN:",Inner_Pts,"\n"*2)
+
+"""We must now begin to link all points by creating the least (minimized) concave polygon. To do this
+Focusing on all points on the convex polygon (OP_n), have circles (or partial circles moving inward toward the center of the polygon) radiate outward towards the inner, unconnected points, which I will call IP_n
+
+Once contacted, IP_n become IP_nc
+I will use OR to represent the current radius of circles from OP (which will always be the largest current radius), and IR_n represent the radius of circles IP_nc, with IR_ns being the smallest current radius from any IP_nc and IR_ns1 being the next smallest current radius of any IP_nc
+
+"""
+
+'''
+class Points():
+  def Outer_Pts():
+
+  def Inner_Pts():
+'''
+
+def InitialWeightsCalc(In_Points,CrntBndPts): 
+  Dict = {}
+  for (i,j) in CrntBndPts:
+    List = []
+    Crnt_Min = float()
+    for (x,y) in In_Points:
+      Check_Dist = sqrt((x-i)**2 + (y-j)**2)      
+      if len(List) == 0:
+        Crnt_Min = Check_Dist
+        List.append((x,y))  
+      else:
+        if Crnt_Min == Check_Dist:
+          List.append((x,y))          
+        elif Crnt_Min >= Check_Dist:
+          del List[:]
+          List.append((x,y))
+          Crnt_Min = Check_Dist 
+        else:
+          pass
+    Dict.update({((i,j),Crnt_Min):List}) 
+  return Dict 
+
+Dist_Dict = InitialWeightsCalc(Inner_Pts,Outer_Pts)
+print("Dist_Dict:",Dist_Dict,"\n"*2)
+
+Min_Dist = min(y for (x,y) in Dist_Dict.keys())
+print("Min_Dist:",Min_Dist,"\n"*2)
+
+Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict.items() if c == Min_Dist}
+print("Shortest:",Shortest,"\n"*2)
+
+if len(Shortest) > 1 and len(Shortest.values()) > 1:
+  if len(Shortest) > 1
+
+
+
+
+
+
+"""
+ 
+When first point (or points in cases of simultaneous contact is made) is contacted, pause all OR circles from OP_n, and have the new point IP_1c have a circle that radiates outward until IR_1 = OR.
+If new contacts are made by IR_1 with IP_2 (or IP_n) before IR_1 = OR, pause IR_1 and have a circle IR_2 radiate from IP_2c until IR_2 = IR_1. Then have IR_1 (and IR_2 if applicable) continue approaching OR. 
+Each time a new point is contacted, pause until IR_ns = IR_ns1 Continue expanding IR_ns of IP_nc until IR_ns = IR_ns1 = OR, pausing until IR_ns = IR_ns1 
+Have all IP_n that are contacted in the process of 
+Whenever two OP_n contact the same point in this process, break the outer link (OL_n-i,n-j) between OP_n, keeping all inner links (IL_n-i,n-j) that were created when XR (any radius) touched IP_n
+Similarly, break IL_n-i,n-j when IR_n-i and IR_n-j both contact any IP_nc"""
