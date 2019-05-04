@@ -1,0 +1,23 @@
+from scipy.spatial import ConvexHull
+import numpy as np
+
+AllPoints = []
+CnvxPolyBndPnts = []
+
+n=10 # number of points
+N=25 # +/- range [input should be even] of points 
+ 
+while len(AllPoints) < n:
+  points = (float(np.random.randint(-N,N)),float(np.random.randint(-N,N)))
+  AllPoints.append(points)
+# creates list of random points {couldn't use For Loop because randomness didn't work}
+ 
+print("AllPoints:", AllPoints,"\n"*2)
+ 
+hull = ConvexHull(AllPoints)
+
+Outer = [AllPoints[i] for i in hull.vertices]
+Inner = [x for x in AllPoints if x not in Outer]
+
+print(Outer)
+print(Inner)
