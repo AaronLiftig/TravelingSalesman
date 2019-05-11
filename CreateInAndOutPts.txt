@@ -30,13 +30,14 @@ class Points():
   def Inner_Pts():
 '''
 
-def Min_Dist_Calc(In_Points,CrntBndPts): #Calculates closest inner point to every outer point
-  Dict = {}
+def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each outer point to each inner point and collects them
+  Dict = {} #TODO put condition in for case with no Inner_Pts
   for (i,j) in CrntBndPts:
     List = []
     Crnt_Min = float()
     for (x,y) in In_Points:
-      Check_Dist = float(sqrt((x-i)**2 + (y-j)**2))      
+      Check_Dist = float(sqrt((x-i)**2 + (y-j)**2))
+      radius_list.append(Check_Dist)     
       if len(List) == 0:
         Crnt_Min = Check_Dist
         List.append((x,y))  
@@ -85,13 +86,12 @@ def residual_ConnectInner_finder(Big_Radius,Smallest_Dict_Entry,In_Points,Inner_
       else:
         break
     print("radius_iter before sort:",radius_iter)
-    radius_iter = radius_iter.sort() # Reverses order to have ascending radii
-    '''del radius_iter[0] # TODO removes everything'''
-    
-    
-    print("radius_iter final:",radius_iter)
-    
-    #TODO
+    radius_iter.sort() # Reverses order to have ascending radii
+    del radius_iter[0]
+
+    print("radius_iter final:",radius_iter) #TODO
+
+
   return Inner_Connect, radius_iter #TODO store Inner_Connect to see when another Outer or Inner_Connect reaches it"""
 # calculates to see if new inner point(s) is within same distance to another inner point
 
