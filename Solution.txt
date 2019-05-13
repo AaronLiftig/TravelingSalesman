@@ -3,12 +3,11 @@ import numpy as np
 from math import sqrt
 
 AllPoints = []
-radius_list = []
 
 n=10 # number of points
 N=25 # +/- range [input should be even] of points 
  
-while len(AllPoints) < n:
+for i in range(n):
   points = (float(np.random.randint(-N,N)),float(np.random.randint(-N,N)))
   AllPoints.append(points)
 # creates list of random points {couldn't use For Loop because randomness didn't work}
@@ -23,14 +22,6 @@ Inner_Pts = [x for x in AllPoints if x not in Outer_Pts]
 print("OUTER:",Outer_Pts,"\n")
 print("INNER:",Inner_Pts,"\n"*2)
 
-'''
-TODO maybe
-class Points():
-  def Outer_Pts():
-
-  def Inner_Pts():
-'''
-
 def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each outer point to each inner point and collects them
   Dict = {} #TODO put condition in for case with no Inner_Pts
   for (i,j) in CrntBndPts:
@@ -38,7 +29,10 @@ def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each outer
     Crnt_Min = float()
     for (x,y) in In_Points:
       Check_Dist = float(sqrt((x-i)**2 + (y-j)**2))
-      radius_list.append(Check_Dist) #TODO may not need to be here    
+      
+      if len(radius_list) == 0:
+        radius_list.append(Check_Dist) #TODO might not need this
+      
       if len(List) == 0:
         Crnt_Min = Check_Dist
         List.append((x,y))  
@@ -52,38 +46,69 @@ def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each outer
         else:
           pass
     Dict.update({((i,j),Crnt_Min):List}) 
-  print("Dist_Dict:",Dict,"\n")  
+  print("Dist_Dict:",Dict,"\n")   
   return Dict
 
-def residual_ConnectInner_finder(Big_Radius,Smallest_Dict_Entry,In_Points,Inner_Connect):
+def Sorter(In_Points, CrntBndPts):
+  if len(In_Points) == 0: #TODO Needs to cycle again through Inner_Connect to connect to two points
+    print("No Inner_Pts Remaining")
+    Shortest = None
+    return Shortest
+  else:
+    pass
+  
+  Dist_Dict = Min_Dist_Calc(In_Points,CrntBndPts)
+  
+  Outer_Radius = min(y for (x,y) in Dist_Dict.keys())
+  Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict.items() if c == Outer_Radius}
+  print("Outer_Radius:",Outer_Radius,"\n")
+  print("Shortest:",Shortest,"\n"*2)
+  return Shortest,Outer_Radius
+
+def simplified(In_Points,CrntBndPts):
+  Shortest,Outer_Radius = Sorter(In_Points,CrntBndPts)
+  
+  if Shortest == None:
+    return Shortest
+  elif len(Shortest) > 1 or len(Shortest.values()) > 1:
+    return Shortest #TODO fix this
+  else:
+    return Shortest,Outer_Radius
+
+def residual_ConnectInner_finder(In_Points,CrntBndPts):
+  Shortest,Outer_Radius = simplified(In_Points,CrntBndPts)
+
+  if Shortest == None:
+    return Shortest
+
+  Inner_Connect = [x for [x] in Shortest.values()]
+  In_Points = [x for x in In_Points if x not in Inner_Connect]
+  print("Inner_Connect:",Inner_Connect,"\n")
+  print("In_Points:",In_Points,"\n"*2)
+
   Next_Smallest = 0
   radius_iter = []
-  radius_iter.append(Big_Radius)
-  "Inner_Connect = []" #TODO may need to stay or delete
+  radius_iter.append(Outer_Radius)
+
   for x in radius_iter:
     print("radius_iter_main:",x)
     while Next_Smallest <= x:
-      Inner_Connect = [x for [x] in Smallest_Dict_Entry.values()] + Inner_Connect
-      In_Points = [x for x in In_Points if x not in Inner_Connect]
-      print("Inner_Connect:",Inner_Connect,"\n")
-      print("In_Points:",In_Points,"\n"*2)
       
-      if len(In_Points) == 0: #TODO Needs to cycle again through Inner_Connect to connect to two points
-        print("No Inner_Pts Remaining")
-        return Inner_Connect, radius_iter 
-      else:
-        pass
-      
-      Dist_Dict_Temp = Min_Dist_Calc(In_Points,Inner_Connect)
+      Dist_Dict_Temp, Smallest = simplified(In_Points,Inner_Connect)
 
-      if min(y for (x,y) in Dist_Dict_Temp.keys()) <= x: 
-        Next_Smallest = min(y for (x,y) in Dist_Dict_Temp.keys()) # TODO Might be able to put these two lines into Min_Dist_Calc
+      if Smallest <= x: 
+        Next_Smallest = Smallest # TODO Might be able to put these two lines into Min_Dist_Calc
         print("Next_Smallest:",Next_Smallest,"\n")
         radius_iter.append(Next_Smallest)
         print("radius_iter_sub:",radius_iter)
-        x = min(radius_iter)
-        Smallest_Dict_Entry = {((a,b),c):d for ((a,b),c),d in Dist_Dict_Temp.items() if c == Next_Smallest}
-        print("Smallest_Dict_Entry:",Smallest_Dict_Entry,"\n"*2)
+        x = Next_Smallest #TODO might need to be changed
+        Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict_Temp.items() if c == Next_Smallest}
+        print("Shortest:",Shortest,"\n"*2)
+
+        Inner_Connect = [x for [x] in Shortest.values()] + Inner_Connect
+        In_Points = [x for x in In_Points if x not in Inner_Connect]
+        print("Inner_Connect:",Inner_Connect,"\n")
+        print("In_Points:",In_Points,"\n"*2)
       else:
         z = min(y for (x,y) in Dist_Dict_Temp.keys())
         print(z)
@@ -97,46 +122,30 @@ def residual_ConnectInner_finder(Big_Radius,Smallest_Dict_Entry,In_Points,Inner_
     print("radius_iter final:",radius_iter) 
     continue
     
-  return Inner_Connect, radius_iter #TODO store Inner_Connect to see when another Outer or Inner_Connect reaches it"""
+  return Inner_Connect, In_Points #TODO store Inner_Connect to see when another Outer or Inner_Connect reaches it"""
 # calculates to see if new inner point(s) is within same distance to another inner point
 
-def Dict_Sorter(Big_Radius,Smallest_Dict_Entry,In_Points,Inner_Connect): # Classifies "Shortest" Dict entry
-  if len(Smallest_Dict_Entry) > 1 or len(Smallest_Dict_Entry.values()) > 1:
-    pass
+radius_list = []
 
-  else:
-    Inner_Connect, radius_iter = residual_ConnectInner_finder(Big_Radius,Smallest_Dict_Entry,In_Points,Inner_Connect)
-    return Inner_Connect, radius_iter
+Connect_In, Inner_Pts = residual_ConnectInner_finder(Inner_Pts,Outer_Pts)
 
+if Connect_In == None:
+  pass
+else:
+  radius_list = set(radius_list)
+  radius_list = list(radius_list)
+  radius_list.sort()
+  for i in radius_list:
+    Combined_Connect = Connect_In + Outer_Pts
+    print("OUTER:",Outer_Pts,"\n")
+    print("INNER:",Inner_Pts,"\n"*2)
+    Connect_In, Inner_Pts = residual_ConnectInner_finder(Inner_Pts,Combined_Connect)
+    if Connect_In == None:
+      pass
 
-Dist_Dict = Min_Dist_Calc(Inner_Pts,Outer_Pts)
-
-Outer_Radius = min(y for (x,y) in Dist_Dict.keys())
-Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict.items() if c == Outer_Radius}
-print("Outer_Radius:",Outer_Radius,"\n")
-print("Shortest:",Shortest,"\n"*2)
-#finds distance to closest inner point from any outer point
-
-Connected_Inner = []
-radius_list = [Outer_Radius]
-
-Connect_In, radi_iteration = Dict_Sorter(Outer_Radius, Shortest,Inner_Pts,Connected_Inner)
-
-'''
-for x in radius_list:
-  Connect_In, radi_iteration = Dict_Sorter(x, Shortest,Inner_Pts,Connected_Inner)
-  if radi_iteration != None:
-    radius_list = radius_list + radi_iteration
-'''
-'''
-if any(Connected_Inner0) == any(Connected_Inner1):
-  List = (x, y for x in Connected_Inner0 for y in Connected_Inner1 if x == y)
-  Outer_Pts = Outer_Pts + List
-'''
 
 """
- 
- 
 Have all IP_n that are contacted in the process of 
 Whenever two OP_n contact the same point in this process, break the outer link (OL_n-i,n-j) between OP_n, keeping all inner links (IL_n-i,n-j) that were created when XR (any radius) touched IP_n
-Similarly, break IL_n-i,n-j when IR_n-i and IR_n-j both contact any IP_nc"""
+Similarly, break IL_n-i,n-j when IR_n-i and IR_n-j both contact any IP_nc
+"""
