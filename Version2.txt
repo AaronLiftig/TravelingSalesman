@@ -1,0 +1,155 @@
+from scipy.spatial import ConvexHull
+import numpy as np
+from math import sqrt
+
+AllPoints = []
+radius_list = set()
+
+n=10 # number of points
+N=25 # +/- range [input should be even] of points 
+ 
+for i in range(n):
+  points = (float(np.random.randint(-N,N)),float(np.random.randint(-N,N)))
+  AllPoints.append(points)
+# creates list of random points {couldn't use For Loop because randomness didn't work}
+ 
+print("AllPoints:", AllPoints,"\n"*2)
+ 
+hull = ConvexHull(AllPoints)
+
+Outer_Pts = [AllPoints[i] for i in hull.vertices]
+Inner_Pts = [x for x in AllPoints if x not in Outer_Pts]
+
+print("OUTER:",Outer_Pts,"\n")
+print("INNER:",Inner_Pts,"\n"*2)
+
+
+def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each outer point to each inner point and collects them
+  Dict = {} #TODO put condition in for case with no Inner_Pts
+  for (i,j) in CrntBndPts:
+    List = []
+    Crnt_Min = float()
+    for (x,y) in In_Points:
+      Check_Dist = float(sqrt((x-i)**2 + (y-j)**2))
+      radius_list.add(Check_Dist) #TODO might not need this
+      if len(List) == 0:
+        Crnt_Min = Check_Dist
+        List.append((x,y))  
+      else:
+        if Crnt_Min == Check_Dist:
+          List.append((x,y))          
+        elif Crnt_Min >= Check_Dist:
+          del List[:]
+          List.append((x,y))
+          Crnt_Min = Check_Dist 
+        else:
+          pass
+    Dict.update({((i,j),Crnt_Min):List}) 
+  print("Dist_Dict:",Dict,"\n")  
+  return Dict
+
+def Sorter(In_Points, CrntBndPts):
+  Dist_Dict = Min_Dist_Calc(In_Points,CrntBndPts)
+  
+  Outer_Radius = min(y for (x,y) in Dist_Dict.keys())
+  Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict.items() if c == Outer_Radius}
+  print("Outer_Radius:",Outer_Radius,"\n")
+  print("Shortest:",Shortest,"\n"*2)
+  return Shortest,Outer_Radius
+
+''' 
+def simplified():
+  Shortest = 0
+
+  Shortest,Outer_Radius = Sorter(In_Points,CrntBndPts)
+  
+  if len(Shortest) > 1 or len(any(Shortest.values())) > 1:
+    return #TODO fix this
+  else:
+    pass
+'''
+
+def residual_ConnectInner_finder(In_Points,CrntBndPts):
+  Shortest,Outer_Radius = Sorter(In_Points,CrntBndPts)
+  
+  if len(Shortest) > 1 or len(any(Shortest.values())) > 1:
+    return #TODO fix this
+  else:
+    pass
+
+  Next_Smallest = 0
+  Inner_Connect = [] 
+  radius_iter = []
+  radius_iter.append(Outer_Radius)
+    
+  for x in radius_iter:
+    print("radius_iter_main:",x)
+    while Next_Smallest <= x:
+      Inner_Connect = [x for [x] in Shortest.values()] + Inner_Connect
+      In_Points = [x for x in In_Points if x not in Inner_Connect]
+      print("Inner_Connect:",Inner_Connect,"\n")
+      print("In_Points:",In_Points,"\n"*2)
+      
+      if len(In_Points) == 0: #TODO Needs to cycle again through Inner_Connect to connect to two points
+        print("No Inner_Pts Remaining")
+        return Inner_Connect, radius_iter #TODO May not need to return these
+      else:
+        pass
+      
+      Dist_Dict_Temp = Min_Dist_Calc(In_Points,Inner_Connect)
+
+      if min(y for (x,y) in Dist_Dict_Temp.keys()) <= x: 
+        Next_Smallest = min(y for (x,y) in Dist_Dict_Temp.keys()) # TODO Might be able to put these two lines into Min_Dist_Calc
+        print("Next_Smallest:",Next_Smallest,"\n")
+        radius_iter.append(Next_Smallest)
+        print("radius_iter_sub:",radius_iter)
+        x = min(radius_iter) #TODO might need to be changed
+        Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict_Temp.items() if c == Next_Smallest}
+        print("Shortest:",Shortest,"\n"*2)
+
+        if len(Shortest) > 1 or len(any(Shortest.values())) > 1:
+          return #TODO fix this
+        else:
+          pass
+      else:
+        z = min(y for (x,y) in Dist_Dict_Temp.keys())
+        print(z)
+        print("NO NEXT SMALLEST","\n"*2)
+        break
+    
+    #TODO Cycles through this part an extra time
+    print("radius_iter before sort:",radius_iter)
+    radius_iter.sort() # Reverses order to have ascending radii
+    Next_Smallest = x
+    print("radius_iter final:",radius_iter) 
+    continue
+    
+  return Inner_Connect, radius_iter #TODO store Inner_Connect to see when another Outer or Inner_Connect reaches it"""
+# calculates to see if new inner point(s) is within same distance to another inner point
+
+
+Connect_In, radi_iteration = residual_ConnectInner_finder(Inner_Pts,Outer_Pts)
+
+radius_list = list(radius_list)
+radius_list.sort()
+
+for x in radius_list:
+  pass #TODO
+
+'''
+for x in radius_list:
+  Connect_In, radi_iteration = Dict_Sorter(x, Shortest,Inner_Pts,Connected_Inner)
+  if radi_iteration != None:
+    radius_list = radius_list + radi_iteration
+
+
+if any(Connected_Inner0) == any(Connected_Inner1):
+  List = (x, y for x in Connected_Inner0 for y in Connected_Inner1 if x == y)
+  Outer_Pts = Outer_Pts + List
+'''
+
+"""
+Have all IP_n that are contacted in the process of 
+Whenever two OP_n contact the same point in this process, break the outer link (OL_n-i,n-j) between OP_n, keeping all inner links (IL_n-i,n-j) that were created when XR (any radius) touched IP_n
+Similarly, break IL_n-i,n-j when IR_n-i and IR_n-j both contact any IP_nc
+"""
