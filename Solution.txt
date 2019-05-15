@@ -82,12 +82,12 @@ def residual_ConnectInner_finder(In_Points,CrntBndPts,r): #cycles through all ra
   print("Inner_Connect:",Inner_Connect,"\n")
   print("In_Points:",In_Points,"\n"*2)
 
-  if r == None: #TODO fix this
+  if r == None:
     radius_iter.append(Outer_Radius)
   else:
     radius_iter.append(r)
 
-  for x in radius_iter: # TODO BUG needs to cycle through radius_iter before cycling through radius_list
+  for x in radius_iter:
     print("radius_iter_main:",x)
     while Next_Smallest <= x:
       
@@ -143,7 +143,7 @@ def Big_Cycle(Connect_In,radius_list,Inner_Pts,Short_List): #cycles through all 
     radius_iter = iter(radius_list)
     next(radius_iter)
 
-    for r in radius_iter:
+    for r in radius_iter: #TODO might change to "while len(Inner_Pts) != 0"
       Combined_Connect = Connect_In + Outer_Pts
       print("OUTER:",Outer_Pts,"\n")
       print("Combined_Connect:",Combined_Connect,"\n")
@@ -154,7 +154,6 @@ def Big_Cycle(Connect_In,radius_list,Inner_Pts,Short_List): #cycles through all 
   return radius_list
 
 Big_Cycle(Connect_In,radius_list,Inner_Pts,Short_List)
-
 
 
 """
