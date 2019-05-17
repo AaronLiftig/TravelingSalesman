@@ -4,14 +4,16 @@ from math import sqrt
 
 AllPoints = []
 
-n=10 # number of points
-N=25 # +/- range [input should be even] of points 
+n=15 # number of points
+N=10 # +/- range of points 
  
 for i in range(n):
   points = (float(np.random.randint(-N,N)),float(np.random.randint(-N,N)))
   AllPoints.append(points)
 # creates list of random points
- 
+
+AllPoints = list(set(AllPoints)) #takes out possible duplicates
+
 print("AllPoints:", AllPoints,"\n"*2)
  
 hull = ConvexHull(AllPoints)
@@ -22,6 +24,8 @@ Inner_Pts = [x for x in AllPoints if x not in Outer_Pts]
 print("OUTER:",Outer_Pts,"\n")
 print("INNER:",Inner_Pts,"\n"*2)
 
+current_edges = [(Outer_Pts[i],Outer_Pts[(i+1)%len(Outer_Pts)]) for i in range(len(Outer_Pts))]
+print("current_edges:",current_edges,"\n"*2)
 
 def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each In_Points to any CrntBndPts
   Dict = {} 
@@ -77,7 +81,7 @@ def residual_ConnectInner_finder(In_Points,CrntBndPts): #cycles through all radi
   Short_List.append(Shortest) #used for second cycle through points
   print("Short_List:",Short_List,"\n"*2)
  
-  Inner_Connect = list(set([y for x in Shortest.values() for y in x])) #Adds connect point
+  Inner_Connect = list(set([y for x in Shortest.values() for y in x])) #Adds connect points
   In_Points = [x for x in In_Points if x not in Inner_Connect] #removes connected point from in_points
   print("Inner_Connect:",Inner_Connect,"\n")
   print("In_Points:",In_Points,"\n"*2)
@@ -98,6 +102,7 @@ def residual_ConnectInner_finder(In_Points,CrntBndPts): #cycles through all radi
         Next_Smallest = Smallest 
         print("Next_Smallest:",Next_Smallest,"\n")
         radius_iter.append(Next_Smallest)
+        radius_iter = list(set(radius_iter))
         print("radius_iter_sub:",radius_iter)
         x = Next_Smallest 
         Shortest = {((a,b),c):d for ((a,b),c),d in Dist_Dict_Temp.items() if c == Next_Smallest}
@@ -145,6 +150,25 @@ def Big_Cycle(Connect_In,Inner_Pts,Short_List): #cycles through all connections 
 
 Big_Cycle(Connect_In,Inner_Pts,Short_List)
 
+#Two boundary points will never connect
+#Subtract outer radius from outer_pts/connect points connection, and subtract associated distance from each entry in Short_List
+#Continue to include outer points in each shortest iteration, but eliminate key-point and include current_edges restriction.
+
+'''
+class polygon:
+  class vertices:
+    def __init__(self,point):
+
+    def intake(self):  
+
+  class edges:
+    def __init__(self,point1,point2):
+
+    def create_edge(self):
+  
+Outer_Pts
+Inner_Pts
+'''
 
 """
 Have all IP_n that are contacted in the process of 
