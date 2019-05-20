@@ -33,19 +33,20 @@ print("current_edges:",current_edges,"\n"*2)
 
 def Min_Dist_Calc(In_Points,CrntBndPts): #Finds minimum distance from each In_Points to any CrntBndPts
   Dict = {} 
+  '''
+  Short_Keys = [a for (a,b) in short_iter.keys]
+  '''
   for (i,j) in CrntBndPts:
     List = []
     Crnt_Min = float()
     for (x,y) in In_Points:
-      '''if (i,j) == (x,y): #TODO make sure points don't subtract from themselves or the previous point
-        continue
-      Short_Keys = [a for (a,b) in Short_List]
-      if (x,y)
       '''
-      #TODO may need to put if statement here to skip Short_List entries
+      if (i,j) == (x,y) or (x,y) is in Short_Keys: #TODO make sure points don't subtract from themselves or the previous point
+        continue
+      '''
       Check_Dist = float(sqrt((x-i)**2 + (y-j)**2))
       # TODO need minimum distance to all non-connected points for checking distance by subtracting current outer radius from minimum distance and seeing if that is smaller than next smallest
-      ''''
+      '''
       if CrntBndPts == Inner_Connect:  
         if (x,y) is in Outer_Pts:
           Check_Dist = Check_Dist - Outer_Radius
@@ -98,7 +99,7 @@ def Connect_Func(In_Points,CrntBndPts,Short_List): #cycles through all radii tha
   if Shortest == None:
     Short_List = Short_List + short_iter
     print("Short_List:",Short_List,"\n"*2)
-    return None,None,short_iter
+    return None,None,Short_List
 
   short_iter.append(Shortest) #used for second cycle through points
   print("short_iter:",short_iter,"\n"*2)
@@ -145,7 +146,6 @@ def Connect_Func(In_Points,CrntBndPts,Short_List): #cycles through all radii tha
         print("NO NEXT SMALLEST","\n"*2)
         break
     
-    print("radius_iter before sort:",radius_iter)
     radius_iter.sort() # Reverses order to have ascending radii
     Next_Smallest = x
     print("radius_iter final:",radius_iter,"\n"*2) 
@@ -175,8 +175,6 @@ def Big_Cycle(Connect_In,Inner_Pts,Short_List): #cycles through all connections 
   return
 
 Big_Cycle(Connect_In,Inner_Pts,Short_List)
-
-
 
 '''
 class polygon:
