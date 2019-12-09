@@ -11,16 +11,17 @@ Individually formulated algorithm solving the Traveling Salesman Problem by mini
  
  ### Pseudocode:
 
-1. Start with a convex hull whose points are OP and with the interior points, IP.
-2. Find Euclidean distances between every pair of points.
-3. The shortest distance for any OP to an IP is the current outer radius, \"OR\".
-4. WHILE all IP are NOT connected by two edges,
-&nbsp;&nbsp;&nbsp;&nbsp;a) IF the distance from that now connected IP, namely IP_1, is longer than any 
-distance from IP_1 to another unconnected IP or another edge (as edges can connect to each other)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i) THEN connect to that point AND repeat step 4.
-&nbsp;&nbsp;&nbsp;&nbsp;b) ELSE, all newly connected IP_n become part of the OP set, AND CONTINUE to
-next smallest \"OR\" (including the connected IP_n).
-&nbsp;&nbsp;&nbsp;&nbsp;c) Whenever inner edges from two OP, through any number of IP_n, connect, DELETE 
+1. Start with a convex hull whose points are OP and with the interior points, IP.<br /><br />
+2. Find Euclidean distances between every pair of points.<br /><br />
+3. The shortest distance for any OP to an IP is the current outer radius, \"OR\".<br /><br />
+4. WHILE all IP are NOT connected by two edges,<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;a) IF the distance from that now connected IP, namely IP_1, is longer than any <br />
+distance from IP_1 to another unconnected IP or another edge (as edges can <br />
+connect to each other)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i) THEN connect to that point AND repeat step 4.<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;b) ELSE, all newly connected IP_n become part of the OP set, AND CONTINUE to<br />
+next smallest \"OR\" (including the connected IP_n).<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;c) Whenever inner edges from two OP, through any number of IP_n, connect, DELETE <br />
 the edge between those OP (including IP_n that are now OP).
   
 ## Another visual analogy is to imagine a vacuum seal bag around an irregular buckyball. Take a cross section of that object where the center of mass is in the cross section. With this algorithm, I am attempting to represent the effect of sucking out the air from the center of mass of the buckyball.
