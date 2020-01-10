@@ -9,7 +9,7 @@ Individually formulated algorithm solving the Traveling Salesman Problem by mini
    
 ## The primary differences between this and a typical greedy algorithm are that all boundary points of the convex hull are starting points, that progress of all radii stop until the smallest radius catches up (representing a kind of bubble surface tension), and that edges of the radii merge.
 
-## The idea is similar to the papers in the following links: https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM; https://arxiv.org/abs/1303.4969
+## The idea is similar to ideas found in the following links: https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM; https://arxiv.org/abs/1303.4969
  
  ### Pseudocode:
 
