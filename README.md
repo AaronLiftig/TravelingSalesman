@@ -18,7 +18,7 @@ Individually formulated algorithm solving the Traveling Salesman Problem by mini
 &nbsp;&nbsp;&nbsp;&nbsp;a) IF the distance from that now connected IP, namely IP_1, is longer than any <br />
 distance from IP_1 to another unconnected IP or another edge (as edges can <br />
 connect to each other)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i) THEN connect to that point AND repeat step 4.<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; i) THEN connect to that point AND repeat step 4,a.<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;b) ELSE, all newly connected IP_n become part of the OP set, AND CONTINUE to<br />
 next smallest \"OR\" (including the connected IP_n).<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;c) Whenever inner edges from two OP, through any number of IP_n, connect, DELETE <br />
