@@ -7,9 +7,12 @@
    
 ## The primary differences between this and a typical greedy algorithm are that all boundary points of the convex hull are starting points, that progress of all radii stop until the smallest radius catches up (representing a kind of bubble surface tension), and that edges of the radii merge.
 
-## The idea is similar to ideas found in the following links: https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM; https://arxiv.org/abs/1303.4969
+## The idea is similar to ideas found in the following links:
+## https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM; 
+## https://arxiv.org/abs/1303.4969;
+## https://www.researchgate.net/publication/257201541_Alpha_Convex_Hull_a_Generalization_of_Convex_Hull
  
- ### Pseudocode:
+### Pseudocode:
 
 1. Start with a convex hull whose points are OP and with the interior points, IP.<br /><br />
 2. Find Euclidean distances between every pair of points.<br /><br />
