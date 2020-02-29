@@ -1,5 +1,5 @@
 # Alternative Traveling Salesman Algorithm
-### (Still a work in progress)
+### (Still a work in progress) I am considering reworking this problem using the midpoints instead of the connected "outer points."
   
 ## I was inspired by the innate optimization of nature. I imagined a cross-section of a bubble enveloping an object whose vertices make up the nodes of a traveling salesman graph. This technique is a modified greedy algorithm starting from all points on the convex hull, where one is, in some sense, trying to minimize the concavity of the convex hull.
 
