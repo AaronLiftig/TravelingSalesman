@@ -1,5 +1,7 @@
 # TravelingSalesman
 ## An alternative traveling salesman algorithm using the midpoints of the convex hull.
+### Still a work in progress.
+### Run current code here: https://repl.it/@AaronLiftig/Traveling-Salesman
 
 ### I was inspired by the innate optimization of nature. I imagined a cross-section of a bubble enveloping an object whose vertices make up the nodes of a traveling salesman graph. This technique is a modified greedy algorithm starting from all midpoints on the verticies of the convex hull, where one is, in some sense, trying to minimize the concavity of the convex hull.
 
