@@ -32,6 +32,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iii) That simulation that yields the shortest distance becomes part of main solution.<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iv) Other temporary virtual connections are disregarded.<br /><br />
 
+### It appears that one of the shortcomings of this algorithm occurs when an IP is collinear to the two OPs whose midpoint is the closest option. I believe the correct way to counter this is to somehow weigh a collinear point as being infinitely far away. 
+### Furthermore, it may generally be best to weigh each midpoint's distance based on the angle that its two OP create with the IP in question. 
+### Another way around this may be to use the distance between the perpendicular intersection of the line, which is created by the two OP, and an IP. This would ensure that a collinear IP (having a distance of zero) could be counted as infintely far away.
 
 ## The questions that I seek to answer are:
 ### What are the upper and lower bounds (or best and worst cases) of its time complexity?<br /><br />What types of graphs does this algorithm work for? This is where my inspiration from natural physical optimization and the \"vacuum effect\" come from.<br /><br />Furthermore, does the \"vacuum effect\" represent some geometric center where if this effect occurs within the ultimate optimal path, then the algorithm may work?<br /><br />What is the probability that this \"center\" generally falls within the optimal path, and can a Monte Carlo simulation be used to answer this question?<br /><br />
