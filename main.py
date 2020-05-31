@@ -64,7 +64,6 @@ class TravelingSalesmanMidpointAlgo:
         print("dictOR:",self.dictOR)
         print("newConnectedIP:",self.newConnectedIP,"\n"*2)
 
-        
     def CheckForMultiOR(self,key,val,min_value): # Checks if an OP connects to multiple IP
         self.UpdateDictOR(key,val[0][0],val[0][1])
         self.UpdateConIP(val[0][0],key,val[0][1])
@@ -86,7 +85,7 @@ class TravelingSalesmanMidpointAlgo:
             self.newConnectedIP[IP].append((MP,Dist))
         except KeyError:
             self.newConnectedIP.update({IP:[(MP,Dist)]})
-        
+
     def UpdateAll(self):   
         for NewIP,ListMP in self.newConnectedIP.items(): #TODO deal with multi-cases
             if len(ListMP)==1:
@@ -94,6 +93,7 @@ class TravelingSalesmanMidpointAlgo:
                     distRef = self.midpointsToIPsRef[p][NewIP]
                     self.midpointsToIPs[p].remove((NewIP,distRef)) # Deletes new IP from midpointsToIPs
                     del self.midpointsToIPsRef[p][NewIP] # Deletes new IP from midpointsToIPsRef
+                del self.midpointsToIPs[ListMP[0][0]] #TODO This might be better somewhere else
                 self.ConnectNewIPs(ListMP[0][0],NewIP)
                 print("\n")
             else:
@@ -101,8 +101,6 @@ class TravelingSalesmanMidpointAlgo:
                 exit()
 
         print("IP:",len(self.convexHull.IP),"\n",self.convexHull.IP,"\n"*2)
-        # for key,val in self.dictOR: # Removes minOR_list values from midpointToIPs dictionary
-            # self.midpointsToIPs[key].remove(val)
 
     def ConnectNewIPs(self,k,v):
         tempOPsList = self.convexHull.midpointDict.pop(k)
