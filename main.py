@@ -1,6 +1,7 @@
 from convex_hull import CreateConvexHull
 from math import sqrt
 from add_node import AddNode
+import time
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
@@ -11,9 +12,14 @@ class TravelingSalesmanMidpointAlgo:
         self.midpointsToIPsRef = {}
         self.GetMidpointToIPs()
 
+        begin = time.time()
         while len(self.convexHull.IP) != 0:
             self.GetMinOR()
             self.UpdateAll()
+        end = time.time()
+        print("Time:",end-begin,"\n"*2)
+
+        self.PrintConnectedOP()
 
     @staticmethod
     def Distance(point1, point2): # Distance Formula
@@ -119,19 +125,31 @@ class TravelingSalesmanMidpointAlgo:
 
         print("linkedOP:",self.convexHull.linkedOP,"\n"*2)
 
-        self.updateOP(v)
-        self.updateIP(v)
+        self.UpdateOP(v)
+        self.UpdateIP(v)
 
         # update midpointsToIPs
         print("New midpointsToIPs:","\n")
         self.AddToMidpointToIPs(newNode,"right")
         self.AddToMidpointToIPs(newNode,"left")
         
-    def updateOP(self,IP):
+    def UpdateOP(self,IP):
         self.convexHull.OP.append(IP) # TODO Make dynamic for various listOP cases
 
-    def updateIP(self,IP):
+    def UpdateIP(self,IP):
         self.convexHull.IP.remove(IP) # TODO Make dynamic for various listOP cases
-                    
+
+    def PrintConnectedOP(self):
+        printList = []
+        for i in range(len(self.convexHull.linkedOP)-1):
+            if i == 0:
+                printList.append(list(self.convexHull.linkedOP.items())[0][0])
+                rightPoint = list(self.convexHull.linkedOP.items())[0][1].right
+                printList.append(rightPoint)
+            else:
+                rightPoint = self.convexHull.linkedOP[rightPoint].right
+                printList.append(rightPoint)
+        print("Path:",printList)
+
 
 TravelingSalesmanMidpointAlgo(15,15)
