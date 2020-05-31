@@ -35,7 +35,7 @@ class CreateConvexHull:
         print("OP:",self.OP,"\n") # Prints points of convex hull (OP)
 
         self.IP = [x for x in allPoints if x not in self.OP]
-        print("IP:",self.IP,"\n"*2) # Prints all inner points (not in OP)
+        print("IP:",len(self.IP),"\n",self.IP,"\n"*2) # Prints all inner points (not in OP)
 
     def CreateLinkedList(self):
         self.linkedOP = {}
@@ -43,4 +43,4 @@ class CreateConvexHull:
         for i in range(len(self.OP)):
             self.linkedOP.update({self.OP[i] : LinkNodes(self.OP,i,self.midpointDict)})
         
-        print("midpointDict:",self.midpointDict,"\n"*2)           
+        print("midpointDict:",self.midpointDict,"\n"*2)
