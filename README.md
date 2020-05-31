@@ -20,17 +20,17 @@
 2. Find all Euclidean distances between those midpoints and all interior points.<br /><br />
 3. WHILE there are still unconnected IP (inner points):<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;a) Find the shortest distance between any existing midpoint and an IP.<br /><br />
-&nbsp;&nbsp;&nbsp;&nbsp;b1) IF the shortest distance is one or many midpoints connecting to one or multiple, **distinct** IP:<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;b1) IF the shortest distance is one or many midpoints connecting to one or multiple, **distinct** (not shared) IP:<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i) Connect the new IP(s) via the OP(s) that share the midpoint(s) that made contact.<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ii) Calculate new midpoints that were created with inclusion of the new IP(s).<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iii) Update current OP and IP.<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iv) Calculate all Euclidean distances from new midpoints to updated IP.<br /><br />
-&nbsp;&nbsp;&nbsp;&nbsp;b2) ELSE IF the shortest distance is one or many midpoints connecting multiple, **non-distinct** IP:<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;b2) ELSE IF the shortest distance is one or many midpoints connecting multiple, **non-distinct** (shared) IP:<br /><br />
 (**Current idea**)<br /><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;i) Treat all such IP as tempory virtual connections.<br /><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ii) Continue through WHILE loop until first new IP is reached by any connecting IP in question.<br /><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iii) That series of connections becomes permanent<br /><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iv) Other temporary virtual connections are disregarded and recalculated.<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ii) Continue through WHILE loop until first new IP is reached by any connecting IP in question (i.e. create recursive simulations that yield distance of next closest point to the midpoints in question).<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iii) That simulation that yields the shortest distance becomes part of main solution.<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iv) Other temporary virtual connections are disregarded.<br /><br />
 
 
 ## The questions that I seek to answer are:
