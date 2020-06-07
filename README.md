@@ -10,9 +10,9 @@ Another visual analogy is to imagine a vacuum seal bag around an irregular bucky
 The primary differences between this and a typical greedy algorithm are that all midpoints of the convex hull are starting points.
 
 The idea is similar to ideas found in the following links:
-https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM; 
-https://arxiv.org/abs/1303.4969;
-https://www.researchgate.net/publication/257201541_Alpha_Convex_Hull_a_Generalization_of_Convex_Hull
+- https://www2.isye.gatech.edu/~mgoetsch/cali/VEHICLE/TSP/TSP017__.HTM
+- https://arxiv.org/abs/1303.4969
+- https://www.researchgate.net/publication/257201541_Alpha_Convex_Hull_a_Generalization_of_Convex_Hull
  
 ### Pseudocode:
 1. Get all midpoints between connected OP (adjacent vertices on the convex hull).
