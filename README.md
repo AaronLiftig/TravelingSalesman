@@ -18,18 +18,18 @@ https://www.researchgate.net/publication/257201541_Alpha_Convex_Hull_a_Generaliz
 1. Get all midpoints between connected OP (adjacent vertices on the convex hull).
 2. Find all Euclidean distances between those midpoints and all interior points.
 3. WHILE there are still unconnected IP (inner points):
-   a) Find the shortest distance between any existing midpoint and an IP.
-   b1) IF the shortest distance is one or many midpoints connecting to one or multiple, **distinct** (not shared) IP:
-      i) Connect the new IP(s) via the OP(s) that share the midpoint(s) that made contact.
-      ii) Calculate new midpoints that were created with inclusion of the new IP(s).
-      iii) Update current OP and IP.
-      iv) Calculate all Euclidean distances from new midpoints to updated IP.
-   b2) ELSE IF the shortest distance is one or many midpoints connecting multiple, **non-distinct** (shared) IP:
+   1. Find the shortest distance between any existing midpoint and an IP.
+   2. IF the shortest distance is one or many midpoints connecting to one or multiple, **distinct** (not shared) IP:
+      1. Connect the new IP(s) via the OP(s) that share the midpoint(s) that made contact.
+      2. Calculate new midpoints that were created with inclusion of the new IP(s).
+      3. Update current OP and IP.
+      4. Calculate all Euclidean distances from new midpoints to updated IP.
+   1. ELSE IF the shortest distance is one or many midpoints connecting multiple, **non-distinct** (shared) IP:
 (**Current idea**)
-      i) Treat all such IP as tempory virtual connections.
-      ii) Continue through WHILE loop until first new IP is reached by any connecting IP in question (i.e. create recursive simulations that yield distance of next closest point to the midpoints in question).
-      iii) That simulation that yields the shortest distance becomes part of main solution.
-      iv) Other temporary virtual connections are disregarded.
+      1. Treat all such IP as tempory virtual connections.
+      2. Continue through WHILE loop until first new IP is reached by any connecting IP in question (i.e. create recursive simulations that yield distance of next closest point to the midpoints in question).
+      3. That simulation that yields the shortest distance becomes part of main solution.
+      4. Other temporary virtual connections are disregarded.
 
 
 It appears that one of the shortcomings of this algorithm occurs when an IP is collinear to the two OPs whose midpoint is the closest option. I believe the correct way to counter this is to somehow weigh a collinear point as being infinitely far away. 
