@@ -3,7 +3,7 @@
 ### Still a work in progress.
 ### Run current code here: https://repl.it/@AaronLiftig/Traveling-Salesman
 
-### I was inspired by the innate optimization of nature. I imagined a cross-section of a bubble enveloping an object whose vertices make up the nodes of a traveling salesman graph. This technique is a modified greedy algorithm starting from all midpoints on the verticies of the convex hull, where one is, in some sense, trying to minimize the concavity of the convex hull.
+### I was inspired by the innate optimization of nature. I imagined a cross-section of a bubble enveloping an object whose vertices make up the nodes of a traveling salesman graph. This technique is a modified greedy algorithm starting from all midpoints between the verticies of the convex hull, where one is trying to minimize the concavity of the convex hull.
 
 #### Another visual analogy is to imagine a vacuum seal bag around an irregular buckyball. Take a cross section of that object where the center of mass is in the cross section. With this algorithm, I am attempting to represent the effect of sucking out the air from the center of mass of the buckyball.
    
