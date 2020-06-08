@@ -5,20 +5,27 @@ from link_nodes import LinkNodes
 
 class CreateConvexHull:
     def __init__(self,pointNum,pointRange):
-        try:
-            pointNum = int(pointNum)
-            pointRange = int(pointRange)
-        except:
-            print("Inputs must be integers.")
-            exit()
+        if isinstance(pointNum,list):
+            all(list(map(type,tup)) == [int,int] for tup in pointNum)
         
-        print("pointNum:",pointNum)
-        print("pointRange:",pointRange,"\n"*2)
+            allPoints = pointNum
+        else:
+            try:
+                pointNum = int(pointNum)
+                pointRange = int(pointRange)
+            except:
+                print("pointNum and pointRange must be integers, or enter pointNum as a list of (x,y) points with integer values")
+                exit()
+            
+            print("pointNum:",pointNum)
+            print("pointRange:",pointRange,"\n"*2)
+                
+            allPoints = self.GetRandomPoints(pointNum,pointRange)
         
-        self.CreatePoints(pointNum,pointRange)
+        self.SeparatePoints(allPoints)
         self.CreateLinkedList()
     
-    def CreatePoints(self,pointNum,pointRange):    
+    def GetRandomPoints(self,pointNum,pointRange):
         allPoints = [] 
 
         for i in range(pointNum):
@@ -28,7 +35,9 @@ class CreateConvexHull:
         # creates list of random points
 
         allPoints = list(set(allPoints)) #takes out possible duplicates
+        return allPoints
 
+    def SeparatePoints(self,allPoints):    
         print("allPoints:",allPoints,"\n")
         
         self.OP = [allPoints[i] for i in ConvexHull(allPoints).vertices]
