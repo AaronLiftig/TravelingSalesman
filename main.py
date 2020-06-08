@@ -5,7 +5,7 @@ import time
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
-    def __init__(self,pointNum: int,pointRange: int):
+    def __init__(self,pointNum,pointRange=15):
         self.convexHull = CreateConvexHull(pointNum,pointRange)
         print("linkedOP:",self.convexHull.linkedOP,"\n"*2)
         self.midpointsToIPs = {}
@@ -22,7 +22,7 @@ class TravelingSalesmanMidpointAlgo:
         self.PrintConnectedOP()
 
     @staticmethod
-    def Distance(point1, point2): # Distance Formula
+    def Distance(point1, point2): # Distance Formula (sqrt is technically not necessary for this problem)
         return sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)
 
     def GetMidpointToIPs(self): # Gets all distances from each Midpoint to IP
@@ -134,10 +134,10 @@ class TravelingSalesmanMidpointAlgo:
         self.AddToMidpointToIPs(newNode,"left")
         
     def UpdateOP(self,IP):
-        self.convexHull.OP.append(IP) # TODO Make dynamic for various listOP cases
+        self.convexHull.OP.append(IP) 
 
     def UpdateIP(self,IP):
-        self.convexHull.IP.remove(IP) # TODO Make dynamic for various listOP cases
+        self.convexHull.IP.remove(IP) 
 
     def PrintConnectedOP(self):
         printList = []
@@ -151,5 +151,8 @@ class TravelingSalesmanMidpointAlgo:
                 printList.append(rightPoint)
         print("Path:",printList)
 
+TravelingSalesmanMidpointAlgo(15,15) 
 
-TravelingSalesmanMidpointAlgo(15,15)
+# (Number of Points,Range of Points +/-) # Both integers
+
+# Can also input a single list of (x,y) points with integer values instead of two seperate integers
