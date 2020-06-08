@@ -25,7 +25,6 @@ The idea is similar to ideas found in the following links:
       3. Update current OP and IP.
       4. Calculate all Euclidean distances from new midpoints to updated IP.
    1. ELSE IF the shortest distance is one or many midpoints connecting multiple, **non-distinct** (shared) IP:
-(**Current idea**)
       1. Treat all such IP as tempory virtual connections.
       2. Continue through WHILE loop until first new IP is reached by any connecting IP in question (i.e. create recursive simulations that yield distance of next closest point to the midpoints in question).
       3. That simulation that yields the shortest distance becomes part of main solution.
