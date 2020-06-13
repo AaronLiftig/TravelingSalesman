@@ -1,5 +1,5 @@
 from convex_hull import CreateConvexHull
-from math import sqrt
+from math import sqrt # Not needed
 from add_node import AddNode
 import time
 
@@ -23,7 +23,7 @@ class TravelingSalesmanMidpointAlgo:
 
     @staticmethod
     def Distance(point1, point2): # Distance Formula (sqrt is technically not necessary for this problem)
-        return sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)
+        return sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)  # sqrt not needed
 
     def GetMidpointToIPs(self): # Gets all distances from each Midpoint to IP
         print("midpointsToIPs:","\n")
@@ -57,58 +57,74 @@ class TravelingSalesmanMidpointAlgo:
 
     def GetMinOR(self): # Gets smallest outer radius (from OP to IP)
         min_value = float("inf")
-        self.newConnectedIP = {}
+        self.IPToMidDict = {}
         for k,v in self.midpointsToIPs.items():
             if v[0][1] == min_value:
                 self.CheckForMultiOR(k,v,min_value)
             elif v[0][1] < min_value:
                 min_value = v[0][1]
-                self.dictOR = {}
-                self.newConnectedIP = {}
+                self.MidToIPDict = {}
+                self.IPToMidDict = {}
                 self.CheckForMultiOR(k,v,min_value)
         
-        print("dictOR:",self.dictOR)
-        print("newConnectedIP:",self.newConnectedIP,"\n"*2)
+        print("MidToIPDict:",self.MidToIPDict,"\n")
+        print("IPToMidDict:",self.IPToMidDict,"\n"*2)
 
     def CheckForMultiOR(self,key,val,min_value): # Checks if an OP connects to multiple IP
-        self.UpdateDictOR(key,val[0][0],val[0][1])
+        self.UpdateMidToIPDict(key,val[0][0],val[0][1])
         self.UpdateConIP(val[0][0],key,val[0][1])
         for i in range(len(val)-1):
             if val[i+1][1] == min_value:
-                self.UpdateDictOR(key,val[i+1][0],val[i+1][1])
+                self.UpdateMidToIPDict(key,val[i+1][0],val[i+1][1]) # Not currently used
                 self.UpdateConIP(val[i+1][0],key,val[i+1][1])
             else:
                 break
 
-    def UpdateDictOR(self,MP,IP,Dist):
+    def UpdateMidToIPDict(self,MP,IP,Dist): # Not currently used
         try:
-            self.dictOR[MP].append((IP,Dist))
+            self.MidToIPDict[MP].append((IP,Dist))
         except KeyError:
-            self.dictOR.update({MP:[(IP,Dist)]})
+            self.MidToIPDict.update({MP:[(IP,Dist)]})
     
     def UpdateConIP(self,IP,MP, Dist):
         try:
-            self.newConnectedIP[IP].append((MP,Dist))
+            self.IPToMidDict[IP].append((MP,Dist))
         except KeyError:
-            self.newConnectedIP.update({IP:[(MP,Dist)]})
+            self.IPToMidDict.update({IP:[(MP,Dist)]})
 
     def UpdateAll(self):   
-        for NewIP,ListMP in self.newConnectedIP.items(): #TODO deal with multi-cases
-            if len(ListMP)==1:
-                for p in self.convexHull.midpointDict.keys():
-                    distRef = self.midpointsToIPsRef[p][NewIP]
-                    self.midpointsToIPs[p].remove((NewIP,distRef)) # Deletes new IP from midpointsToIPs
-                    del self.midpointsToIPsRef[p][NewIP] # Deletes new IP from midpointsToIPsRef
-                del self.midpointsToIPs[ListMP[0][0]] #TODO This might be better somewhere else
-                self.ConnectNewIPs(ListMP[0][0],NewIP)
-                print("\n")
-            else:
-                print("multi-case")
+        usedDict = {} # To stop IPToMidDict from using same midpoint again
+        for NewIP,ListMP in self.IPToMidDict.items(): #TODO deal with multi-cases
+            if len(ListMP)==1: # When an IP is only touched by one MP
+                try:
+                    usedDict[ListMP[0][0]]  # Checks if midpoint is in used dictionary
+                    continue
+                except:
+                    usedDict.update({ListMP[0][0]:None})            
+                ListIP = self.MidToIPDict[ListMP[0][0]]
+                count = len(ListIP)
+                for i in range(count):
+                    IP = ListIP[i]
+                    for p in self.convexHull.midpointDict.keys():
+                        if p == ListMP[0][0]: # Is completely deleted directly after loop
+                            continue
+                        distRef = self.midpointsToIPsRef[p][IP[0]]
+                        self.midpointsToIPs[p].remove((IP[0],distRef)) # Deletes new IP from midpointsToIPs
+                        del self.midpointsToIPsRef[p][IP[0]] # Deletes new IP from midpointsToIPsRef
+                    del self.midpointsToIPs[ListMP[0][0]]
+
+                    self.ConnectNewIPs(ListMP[0][0],IP[0],i,count)
+                    print("\n")
+            else: # When multiple Midpoints touch the same IP
+                print("multi-case requiring recursion")
                 exit()
 
         print("IP:",len(self.convexHull.IP),"\n",self.convexHull.IP,"\n"*2)
 
-    def ConnectNewIPs(self,k,v):
+    def ConnectNewIPs(self,k,v,i,count):
+        # if i < count:
+        #     tempOPsList = self.convexHull.midpointDict[k]
+        # elif i == count:
         tempOPsList = self.convexHull.midpointDict.pop(k)
         
         leftOfMid = tempOPsList[0]
@@ -150,6 +166,8 @@ class TravelingSalesmanMidpointAlgo:
                 rightPoint = self.convexHull.linkedOP[rightPoint].right
                 printList.append(rightPoint)
         print("Path:",printList)
+
+
 
 TravelingSalesmanMidpointAlgo(15,15) 
 
