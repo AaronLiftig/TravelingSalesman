@@ -1,7 +1,7 @@
 from convex_hull import CreateConvexHull
-from math import sqrt # Not needed
 from add_node import AddNode
 import time
+import numpy as np
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
@@ -22,9 +22,20 @@ class TravelingSalesmanMidpointAlgo:
         self.PrintConnectedOP()
 
     @staticmethod
-    def Distance(point1, point2): # Distance Formula (sqrt is technically not necessary for this problem)
-        return sqrt((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)  # sqrt not needed
+    def Distance(point1, point2): # Distance Formula
+        return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**.5 # Taking sqrt not needed
 
+    @staticmethod
+    def GetAngle(leftOP,rightOP,IP): # Find angle to order IP when one MP connects to multiple IP
+        vector_1 = (leftOP[0]-rightOP[0],leftOP[1]-rightOP[1])
+        vector_2 = (IP[0]-rightOP[0],IP[1]-rightOP[1])
+
+        unitVector_1 = vector_1 / np.linalg.norm(vector_1)
+        unitVector_2 = vector_2 / np.linalg.norm(vector_2)
+        dot_product = np.dot(unitVector_1, unitVector_2)
+        angle = np.arccos(dot_product)
+        return angle #TODO fix return
+    
     def GetMidpointToIPs(self): # Gets all distances from each Midpoint to IP
         print("midpointsToIPs:","\n")
         for OP in self.convexHull.linkedOP.items():
@@ -56,27 +67,27 @@ class TravelingSalesmanMidpointAlgo:
             self.midpointsToIPs.update({OP1.leftMidpoint:tempList})
 
     def GetMinOR(self): # Gets smallest outer radius (from OP to IP)
-        min_value = float("inf")
+        minVal = float("inf")
         self.IPToMidDict = {}
         for k,v in self.midpointsToIPs.items():
-            if v[0][1] == min_value:
-                self.CheckForMultiOR(k,v,min_value)
-            elif v[0][1] < min_value:
-                min_value = v[0][1]
+            if v[0][1] == minVal:
+                self.CheckForMultiOR(k,v,minVal)
+            elif v[0][1] < minVal:
+                minVal = v[0][1]
                 self.MidToIPDict = {}
                 self.IPToMidDict = {}
-                self.CheckForMultiOR(k,v,min_value)
+                self.CheckForMultiOR(k,v,minVal)
         
         print("MidToIPDict:",self.MidToIPDict,"\n")
         print("IPToMidDict:",self.IPToMidDict,"\n"*2)
 
-    def CheckForMultiOR(self,key,val,min_value): # Checks if an OP connects to multiple IP
+    def CheckForMultiOR(self,key,val,minVal): # Checks if an OP connects to multiple IP
         self.UpdateMidToIPDict(key,val[0][0],val[0][1])
-        self.UpdateConIP(val[0][0],key,val[0][1])
+        self.UpdateIPToMidDict(val[0][0],key,val[0][1])
         for i in range(len(val)-1):
-            if val[i+1][1] == min_value:
+            if val[i+1][1] == minVal:
                 self.UpdateMidToIPDict(key,val[i+1][0],val[i+1][1]) # Not currently used
-                self.UpdateConIP(val[i+1][0],key,val[i+1][1])
+                self.UpdateIPToMidDict(val[i+1][0],key,val[i+1][1])
             else:
                 break
 
@@ -86,7 +97,7 @@ class TravelingSalesmanMidpointAlgo:
         except KeyError:
             self.MidToIPDict.update({MP:[(IP,Dist)]})
     
-    def UpdateConIP(self,IP,MP, Dist):
+    def UpdateIPToMidDict(self,IP,MP, Dist):
         try:
             self.IPToMidDict[IP].append((MP,Dist))
         except KeyError:
@@ -94,34 +105,68 @@ class TravelingSalesmanMidpointAlgo:
 
     def UpdateAll(self):   
         usedDict = {} # To stop IPToMidDict from using same midpoint again
-        for NewIP,ListMP in self.IPToMidDict.items(): #TODO deal with multi-cases
+        for NewIP,ListMP in self.IPToMidDict.items():
             if len(ListMP)==1: # When an IP is only touched by one MP
                 try:
                     usedDict[ListMP[0][0]]  # Checks if midpoint is in used dictionary
                     continue
                 except:
-                    usedDict.update({ListMP[0][0]:None})            
+                    usedDict.update({ListMP[0][0]:None})
                 ListIP = self.MidToIPDict[ListMP[0][0]]
                 count = len(ListIP)
-                for i in range(count):
-                    IP = ListIP[i]
-                    for p in self.convexHull.midpointDict.keys():
-                        if p == ListMP[0][0]: # Is completely deleted directly after loop
-                            continue
-                        distRef = self.midpointsToIPsRef[p][IP[0]]
-                        self.midpointsToIPs[p].remove((IP[0],distRef)) # Deletes new IP from midpointsToIPs
-                        del self.midpointsToIPsRef[p][IP[0]] # Deletes new IP from midpointsToIPsRef
-                    del self.midpointsToIPs[ListMP[0][0]]
-
-                    self.ConnectNewIPs(ListMP[0][0],IP[0],i,count)
-                    print("\n")
+                if count == 1:
+                    self.UpdateDicts(ListMP[0][0],ListIP[0][0])
+                    self.ConnectNewIPs(ListMP[0][0],ListIP[0][0])
+                else: #TODO Use tree to insert IP instead of creating IP angle list
+                    tree = None
+                    self.angleList = []
+                    for i in range(count):
+                        IP = ListIP[i]
+                        leftRightOP = self.convexHull.midpointDict[ListMP[0][0]]
+                        angle = self.GetAngle(leftRightOP[0],leftRightOP[1],IP[0])
+                        tree = self.AngleBinaryTree((IP[0],IP[1],angle),i,tree)
+                        self.CreateAngleListFromTree(tree)
+                        print(self.angleList)
+                        self.UpdateDicts(ListMP[0][0],IP[0])
+                        self.ConnectNewIPs(ListMP[0][0],IP[0],i,count)
             else: # When multiple Midpoints touch the same IP
                 print("multi-case requiring recursion")
                 exit()
 
         print("IP:",len(self.convexHull.IP),"\n",self.convexHull.IP,"\n"*2)
 
-    def ConnectNewIPs(self,k,v,i,count):
+    def AngleBinaryTree(self,angleIP,i,tree=None):
+        if i == 0:
+            self.point = angleIP
+            self.left = None
+            self.right = None
+        elif tree.point[2] > angleIP[2]:
+            if tree.left is not None:
+                tree.left = self.AngleBinaryTree(angleIP,i,tree.left)
+            else:
+                tree.left == self.AngleBinaryTree(angleIP,0)
+        elif tree.point[2] < angleIP[2]:
+            if tree.right is not None:
+                tree.right = self.AngleBinaryTree(angleIP,i,tree.right)
+            else:
+                tree.right == self.AngleBinaryTree(angleIP,0)
+    
+    def CreateAngleListFromTree(self,tree):
+        if tree:
+            self.CreateAngleListFromTree(tree.left)
+            self.angleList.append(tree.point)
+            self.CreateAngleListFromTree(tree.right)
+            
+    def UpdateDicts(self,MP,IP):
+        for p in self.convexHull.midpointDict.keys():
+            if p == MP: # Is completely deleted directly after loop
+                continue
+            distRef = self.midpointsToIPsRef[p][IP]
+            self.midpointsToIPs[p].remove((IP,distRef)) # Deletes new IP from midpointsToIPs
+            del self.midpointsToIPsRef[p][IP] # Deletes new IP from midpointsToIPsRef
+        del self.midpointsToIPs[MP] # Deletes entire midpoint case
+
+    def ConnectNewIPs(self,k,v,i=None,count=None):
         # if i < count:
         #     tempOPsList = self.convexHull.midpointDict[k]
         # elif i == count:
@@ -148,13 +193,14 @@ class TravelingSalesmanMidpointAlgo:
         print("New midpointsToIPs:","\n")
         self.AddToMidpointToIPs(newNode,"right")
         self.AddToMidpointToIPs(newNode,"left")
+        print("\n")
         
     def UpdateOP(self,IP):
         self.convexHull.OP.append(IP) 
 
     def UpdateIP(self,IP):
         self.convexHull.IP.remove(IP) 
-
+    
     def PrintConnectedOP(self):
         printList = []
         for i in range(len(self.convexHull.linkedOP)-1):
@@ -168,8 +214,7 @@ class TravelingSalesmanMidpointAlgo:
         print("Path:",printList)
 
 
-
-TravelingSalesmanMidpointAlgo(15,15) 
+TravelingSalesmanMidpointAlgo(50,15) 
 
 # (Number of Points,Range of Points +/-) # Both integers
 
