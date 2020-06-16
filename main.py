@@ -1,7 +1,14 @@
 from convex_hull import CreateConvexHull
-from add_node import AddNode
+from link_nodes import AddNode
 import time
 import numpy as np
+
+
+class Node:
+    def __init__(self,angleIP):
+        self.point = angleIP
+        self.left = None
+        self.right = None
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
@@ -81,7 +88,6 @@ class TravelingSalesmanMidpointAlgo:
                 self.IPToMidDict = {}
                 self.SetIP = set()
                 self.CheckForMultiOR(k,v,minVal)
-        
         print("MidToIPDict:",self.MidToIPDict,"\n")
         print("IPToMidDict:",self.IPToMidDict,"\n"*2)
 
@@ -129,43 +135,47 @@ class TravelingSalesmanMidpointAlgo:
                     self.DeleteFromDicts(MP,ListIP[0][0])
                     self.ConnectNewIPs(ListIP[0][0],leftOfMid,rightOfMid)
                 else: # CASE: when the MP touches multiple IP
-                    self.tree = None
+                    tree = None
                     for i in range(count):
                         IP = ListIP[i]
                         angle = self.GetAngle(leftOfMid,rightOfMid,IP[0])
-                        self.InsertIntoOPs((IP[0],angle),leftOfMid,rightOfMid,i,self.tree)
+                        tree = self.InsertIntoOPsTree((IP[0],angle),leftOfMid,rightOfMid,i,tree)
                         self.DeleteFromDicts(MP,IP[0])
             else: # CASE: When multiple Midpoints touch the same IP
                 print("multi-case requiring recursion")
                 exit()
 
         print("IP:",len(self.convexHull.IP),"\n",self.convexHull.IP,"\n"*2)
-    
-    def InsertIntoOPs(self,angleIP,leftOP,rightOP,i,tree=None):
+            
+    def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree=None):
         if i == 0:
-            tree.point = angleIP
-            tree.left = None
-            tree.right = None
             self.ConnectNewIPs(angleIP[0],leftOP,rightOP)
+            return Node(angleIP)
         elif tree.point[1] > angleIP[1]:
             if tree.left is not None:
-                tree.left = self.AngleBinaryTree(angleIP,leftOP,tree.point,i,tree.left)
+                tree.left = self.InsertIntoOPsTree(angleIP,leftOP,tree.point[0],i,tree.left)
             else:
-                tree.left == self.AngleBinaryTree(angleIP,leftOP,tree.point,0,tree.left)
+                tree.left == self.InsertIntoOPsTree(angleIP,leftOP,tree.point[0],0,tree.left)
         elif tree.point[1] < angleIP[1]:
             if tree.right is not None:
-                tree.right = self.AngleBinaryTree(angleIP,tree.point,rightOP,i,tree.right)
+                tree.right = self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,i,tree.right)
             else:
-                tree.right == self.AngleBinaryTree(angleIP,tree.point,rightOP,0,tree.right)
-            
+                tree.right == self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,0,tree.right)
+    
     def DeleteFromDicts(self,MP,IP):
         for p in self.convexHull.midpointDict.keys():
             if p == MP: # Is completely deleted directly after loop
                 continue
-            distRef = self.midpointsToIPsRef[p][IP]
+            try: 
+                distRef = self.midpointsToIPsRef[p][IP]
+            except:
+                continue
             self.midpointsToIPs[p].remove((IP,distRef)) # Deletes new IP from midpointsToIPs
             del self.midpointsToIPsRef[p][IP] # Deletes new IP from midpointsToIPsRef
-        del self.midpointsToIPs[MP] # Deletes entire midpoint case
+        try:
+            del self.midpointsToIPs[MP] # Deletes entire midpoint case
+        except:
+            pass
 
     def ConnectNewIPs(self,IP,leftOfMid,rightOfMid):
         newNode = AddNode(IP,leftOfMid,rightOfMid,self.convexHull.midpointDict)
@@ -175,7 +185,7 @@ class TravelingSalesmanMidpointAlgo:
         self.convexHull.linkedOP[leftOfMid].rightMidpoint = newNode.leftMidpoint
         self.convexHull.linkedOP[rightOfMid].left = IP
         self.convexHull.linkedOP[rightOfMid].leftMidpoint = newNode.rightMidpoint
-        self.convexHull.linkedOP.update({IP : newNode})
+        self.convexHull.linkedOP.update({IP:newNode})
 
         print("linkedOP:",self.convexHull.linkedOP,"\n"*2)
 
