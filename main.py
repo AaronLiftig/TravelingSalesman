@@ -162,7 +162,7 @@ class TravelingSalesmanMidpointAlgo:
             else:
                 tree.right == self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,0,tree.right)
     
-    def DeleteFromDicts(self,MP,IP):
+    def DeleteFromDicts(self,MP,IP): #TODO Find better way to prevent exceptions
         for p in self.convexHull.midpointDict.keys():
             if p == MP: # Is completely deleted directly after loop
                 continue
@@ -213,7 +213,7 @@ class TravelingSalesmanMidpointAlgo:
         print("Path:",printList)
 
 
-TravelingSalesmanMidpointAlgo(50,15) 
+TravelingSalesmanMidpointAlgo(30,15) 
 
 # (Number of Points,Range of Points +/-) # Both integers
 
