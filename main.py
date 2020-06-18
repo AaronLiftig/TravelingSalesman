@@ -34,15 +34,13 @@ class TravelingSalesmanMidpointAlgo:
         return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**.5 # Taking sqrt not needed
 
     @staticmethod
-    def GetAngle(leftOP,rightOP,IP): # Find angle to order IP when one MP connects to multiple IP (Angle is from right OP's perspective)
-        vector_1 = (leftOP[0]-rightOP[0],leftOP[1]-rightOP[1])
-        vector_2 = (IP[0]-rightOP[0],IP[1]-rightOP[1])
+    def GetAngle(leftOP,midpoint,IP): # Find angle to order IP when one MP connects to multiple IP (Angle is from right OP's perspective)
+        vector1 = (leftOP[0] - midpoint[0],leftOP[1] - midpoint[1])
+        vector2 = (IP[0] - midpoint[0],IP[1] - midpoint[1])
 
-        unitVector_1 = vector_1 / np.linalg.norm(vector_1)
-        unitVector_2 = vector_2 / np.linalg.norm(vector_2)
-        dot_product = np.dot(unitVector_1, unitVector_2)
-        angle = np.arccos(dot_product)
-        return angle
+        dotProduct = np.dot(vector1, vector2) 
+        normsProduct = (np.linalg.norm(vector1)*np.linalg.norm(vector2))
+        return np.arccos(dotProduct/normsProduct)
     
     def GetMidpointToIPs(self): # Gets all distances from each Midpoint to IP
         print("midpointsToIPs:","\n")
@@ -58,9 +56,7 @@ class TravelingSalesmanMidpointAlgo:
                 tempVal = self.Distance(OP1.rightMidpoint,b)
             elif directionString.lower() == "left":
                 tempVal = self.Distance(OP1.leftMidpoint,b)
-            else:
-                print("string error")
-                exit()
+
             tempDict.update({b:tempVal}) 
             tempList.append((b,tempVal)) # TODO May not need list because it won't be sorted
         
@@ -138,29 +134,32 @@ class TravelingSalesmanMidpointAlgo:
                     tree = None
                     for i in range(count):
                         IP = ListIP[i]
-                        angle = self.GetAngle(leftOfMid,rightOfMid,IP[0])
+                        angle = self.GetAngle(leftOfMid,MP,IP[0])
                         tree = self.InsertIntoOPsTree((IP[0],angle),leftOfMid,rightOfMid,i,tree)
                         self.DeleteFromDicts(MP,IP[0])
             else: # CASE: When multiple Midpoints touch the same IP
                 print("multi-case requiring recursion")
                 exit()
-
         print("IP:",len(self.convexHull.IP),"\n",self.convexHull.IP,"\n"*2)
             
-    def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree=None):
+    def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree): #TODO Make into AVL tree
         if i == 0:
             self.ConnectNewIPs(angleIP[0],leftOP,rightOP)
             return Node(angleIP)
         elif tree.point[1] > angleIP[1]:
             if tree.left is not None:
                 tree.left = self.InsertIntoOPsTree(angleIP,leftOP,tree.point[0],i,tree.left)
+                return tree.left
             else:
-                tree.left == self.InsertIntoOPsTree(angleIP,leftOP,tree.point[0],0,tree.left)
+                tree.left = self.InsertIntoOPsTree(angleIP,leftOP,tree.point[0],0,tree.left)
+                return tree.left
         elif tree.point[1] < angleIP[1]:
             if tree.right is not None:
                 tree.right = self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,i,tree.right)
+                return tree.right
             else:
-                tree.right == self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,0,tree.right)
+                tree.right = self.InsertIntoOPsTree(angleIP,tree.point[0],rightOP,0,tree.right)
+                return tree.right
     
     def DeleteFromDicts(self,MP,IP): #TODO Find better way to prevent exceptions
         for p in self.convexHull.midpointDict.keys():
@@ -212,8 +211,11 @@ class TravelingSalesmanMidpointAlgo:
                 printList.append(rightPoint)
         print("Path:",printList)
 
+        
+TravelingSalesmanMidpointAlgo(30,30)
 
-TravelingSalesmanMidpointAlgo(30,15) 
+# Simple test case:
+#TravelingSalesmanMidpointAlgo([(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1)]) 
 
 # (Number of Points,Range of Points +/-) # Both integers
 
