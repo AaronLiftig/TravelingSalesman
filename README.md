@@ -18,7 +18,8 @@ The idea is similar to ideas found in the following links:
 1. Get all midpoints between connected OP (adjacent vertices on the convex hull).
 2. Find all Euclidean distances between those midpoints and all interior points.
 3. WHILE there are still unconnected IP (inner points):
-   1. Find the shortest distance between any existing midpoint and an IP.
+   1. Find the shortest distance between any existing midpoint and an IP. 
+      1. An IP that is collinear to the two OP that produce a midpoint are treated as being infinitely far away.
    2. IF the shortest distance is one or many midpoints connecting to one or multiple, **distinct** (not shared) IP:
       1. Connect the new IP(s) via the OP(s) that share the midpoint(s) that made contact.
       2. Calculate new midpoints that were created with inclusion of the new IP(s).
@@ -31,9 +32,9 @@ The idea is similar to ideas found in the following links:
       4. Other temporary virtual connections are disregarded.
 
 
-It appears that one of the shortcomings of this algorithm occurs when an IP is collinear to the two OPs whose midpoint is the closest option. I believe the correct way to counter this is to somehow weigh a collinear point as being infinitely far away. 
+It appears that one of the original shortcomings of this algorithm was when an IP is collinear to the two OPs whose midpoint is the closest option. I counteracted this by treating such collinear points as being infinitely far away from the corresponding midpoint. 
 Furthermore, it may generally be best to weigh each midpoint's distance based on the angle that its two OP create with the IP in question. 
-Another way around this may be to use the distance between the perpendicular intersection of the line, which is created by the two OP, and an IP. This would ensure that a collinear IP (having a distance of zero) could be counted as infintely far away.
+Another way around this may be to use the distance between the perpendicular intersection of the line, which is created by the two OP, and an IP. This would ensure that a collinear IP (having a distance of zero) could be counted as infintely far away. This has the downside of needing to somehow specify where the IP is relative to the two OP, as treating the OP as being on a line and finding the IP closest to that line may have undesired effects.
 
 ### The questions that I seek to answer are:
 - What are the upper and lower bounds (or best and worst cases) of its time complexity?
