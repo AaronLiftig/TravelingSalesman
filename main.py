@@ -2,7 +2,7 @@ from convex_hull import CreateConvexHull
 from link_nodes import AddNode
 import time
 import numpy as np
-from math import inf as infinity
+from math import inf as infinity, pi
 
 
 class TreeNode:
@@ -39,20 +39,26 @@ class TravelingSalesmanMidpointAlgo:
     def AddToMidpointToIPs(self,OP,directionString):
         tempDict = {}
         tempList = []
-        for b in self.convexHull.IP:
+        for IP in self.convexHull.IP:
             if directionString.lower() == 'right':
-                if self.IsCollinear(self.convexHull.midpointDict[OP.rightMidpoint],b) == True:
-                    tempVal = infinity
-                else:
-                    tempVal = self.Distance(OP.rightMidpoint,b)
+                OPs = self.convexHull.midpointDict[OP.rightMidpoint]
+                leftOP,rightOP = OPs[0],OPs[1]
+                angle = self.GetAngle(leftOP,OP.rightMidpoint,IP)
             elif directionString.lower() == 'left':
-                if self.IsCollinear(self.convexHull.midpointDict[OP.leftMidpoint],b) == True:
-                    tempVal = infinity
-                else:
-                    tempVal = self.Distance(OP.leftMidpoint,b)
+                OPs = self.convexHull.midpointDict[OP.leftMidpoint]
+                leftOP,rightOP = OPs[0],OPs[1]
+                angle = self.GetAngle(leftOP,OP.leftMidpoint,IP)
+                    
+            if (angle == 0) | (angle == pi):   
+                tempVal = infinity
+            elif angle <= pi/2:
+                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle
+            elif angle >= pi/2:
+                angle = pi - angle
+                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle    
 
-            tempDict.update({b:tempVal}) 
-            tempList.append((b,tempVal)) # TODO May not need list because it won't be sorted
+            tempDict.update({IP:tempVal}) 
+            tempList.append((IP,tempVal)) # TODO May not need list because it won't be sorted
         
         tempList.sort(key=lambda tup: tup[1]) # TODO Don't sort. Always put min(s) at the front of lists
         if directionString.lower() == 'right':    
@@ -63,23 +69,23 @@ class TravelingSalesmanMidpointAlgo:
             print(OP.leftMidpoint,':',tempList,'\n')
             self.midpointsToIPsRef.update({OP.leftMidpoint:tempDict}) # Used as reference to delete from midpointsToIPs
             self.midpointsToIPs.update({OP.leftMidpoint:tempList})
-
-    @staticmethod
-    def Distance(point1, point2): # Distance Formula
-        return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2)**.5 # Taking sqrt not needed
     
     @staticmethod
-    def IsCollinear(OPsList,IP): # Checks for collinearity because midpoint of collinear OP should never connect
+    def ShortestDistance(leftOP,rightOP,IP):
+        # Create line in the form ax + by + c = 0
+        a = rightOP[1] - leftOP[1] 
+        b = leftOP[0] - rightOP[0]  
+        c = - (a * (leftOP[0]) + b * (leftOP[1]))
+
+        return abs((a * IP[0] + b * IP[1] + c)) / (a**2 + b**2)**.5
+    
+    @staticmethod
+    def CollinearFactor(OPsList,IP): # Checks for collinearity because midpoint of collinear OP should never connect
         leftOP,rightOP = OPsList[0],OPsList[1]
         x1,y1 = leftOP[0],leftOP[1]
         x2,y2 = rightOP[0],rightOP[1]
         x3,y3 = IP[0],IP[1]
-        area = x1*(y2-y3)+x2*(y3-y1)+x3*(y1-y2) # Checks using area of triangle
-
-        if area != 0:
-            return False
-        else:
-            return True
+        return x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2) # Checks using area of triangle
 
     def GetMinOR(self): # Gets smallest outer radius (from OP to IP)
         minVal = float('inf')
@@ -233,7 +239,7 @@ class TravelingSalesmanMidpointAlgo:
                 printList.append(rightPoint)
         print('Path:',printList)
 
-TravelingSalesmanMidpointAlgo(30,30)
+TravelingSalesmanMidpointAlgo(15,15)
 
 # Simple test case:
 #TravelingSalesmanMidpointAlgo([(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1)]) 
