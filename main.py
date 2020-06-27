@@ -22,8 +22,8 @@ class TravelingSalesmanMidpointAlgo:
 
         begin = time.time()
         while len(self.convexHull.IP) != 0:
-            self.GetMinOR()
-            self.Update_OP_IP()
+            self.GetClosestIPs()
+            self.UpdatePointsLists()
             self.UpdateAllDicts()
         end = time.time()
         print('Time:',end-begin,'\n'*2)
@@ -48,12 +48,14 @@ class TravelingSalesmanMidpointAlgo:
                 OPs = self.convexHull.midpointDict[OP.leftMidpoint]
                 leftOP,rightOP = OPs[0],OPs[1]
                 angle = self.GetAngle(leftOP,OP.leftMidpoint,IP)
-                    
-            if (angle == 0) | (angle == pi):   
-                tempVal = infinity
+
+            # Divides shortest distance between OPs line and IP by the angle created by the leftOP--midpoint--IP
+            # May need to be a multiple of the angle or some other variation
+            if (angle == 0) | (angle == pi): 
+                tempVal = infinity # inf if IP is collinear to OPs
             elif angle <= pi/2:
                 tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle
-            elif angle >= pi/2:
+            elif angle > pi/2:
                 angle = pi - angle
                 tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle    
 
@@ -76,35 +78,27 @@ class TravelingSalesmanMidpointAlgo:
         a = rightOP[1] - leftOP[1] 
         b = leftOP[0] - rightOP[0]  
         c = - (a * (leftOP[0]) + b * (leftOP[1]))
-
+        # Finds shortest distance between IP and line created by OPs
         return abs((a * IP[0] + b * IP[1] + c)) / (a**2 + b**2)**.5
-    
-    @staticmethod
-    def CollinearFactor(OPsList,IP): # Checks for collinearity because midpoint of collinear OP should never connect
-        leftOP,rightOP = OPsList[0],OPsList[1]
-        x1,y1 = leftOP[0],leftOP[1]
-        x2,y2 = rightOP[0],rightOP[1]
-        x3,y3 = IP[0],IP[1]
-        return x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2) # Checks using area of triangle
 
-    def GetMinOR(self): # Gets smallest outer radius (from OP to IP)
+    def GetClosestIPs(self): # Gets smallest outer radius (from OP to IP)
         minVal = float('inf')
         self.MidToIPDict = {}
         self.IPToMidDict = {}
         self.SetIP = set()
         for k,v in self.midpointsToIPs.items():
             if v[0][1] == minVal:
-                self.CheckForMultiOR(k,v,minVal)
+                self.CheckForMultiConnectionCase(k,v,minVal)
             elif v[0][1] < minVal:
                 minVal = v[0][1]
                 self.MidToIPDict = {}
                 self.IPToMidDict = {}
                 self.SetIP = set()
-                self.CheckForMultiOR(k,v,minVal)
+                self.CheckForMultiConnectionCase(k,v,minVal)
         print('MidToIPDict:',self.MidToIPDict,'\n')
         print('IPToMidDict:',self.IPToMidDict,'\n'*2)
 
-    def CheckForMultiOR(self,key,val,minVal): # Checks if an OP connects to multiple IP
+    def CheckForMultiConnectionCase(self,key,val,minVal): # Checks if an OP connects to multiple IP
         self.UpdateMidToIPDict(key,val[0][0],val[0][1])
         self.UpdateIPToMidDict(val[0][0],key,val[0][1])
         self.SetIP.add(val[0][0])
@@ -172,6 +166,7 @@ class TravelingSalesmanMidpointAlgo:
         return np.arccos(dotProduct/normsProduct)
     
     def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree=None): #TODO Make into AVL tree
+    # Uses binary tree to insert into linkedOP
         if i == 0:
             self.ConnectNewIPs(angleIP[0],leftOP,rightOP)
             return TreeNode(angleIP)
@@ -219,7 +214,7 @@ class TravelingSalesmanMidpointAlgo:
         self.AddToMidpointToIPs(newNode,'left')
         print('\n')
         
-    def Update_OP_IP(self):
+    def UpdatePointsLists(self):
         for IP in self.SetIP:
             self.convexHull.OP.append(IP) 
             self.convexHull.IP.remove(IP) 
