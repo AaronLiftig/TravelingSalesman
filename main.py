@@ -51,13 +51,10 @@ class TravelingSalesmanMidpointAlgo:
 
             # Divides shortest distance between OPs line and IP by the angle created by the leftOP--midpoint--IP
             # May need to be a multiple of the angle or some other variation
-            if (angle == 0) | (angle == pi): 
+            try:
+                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / np.sin(angle)
+            except ZeroDivisionError:    
                 tempVal = infinity # inf if IP is collinear to OPs
-            elif angle <= pi/2:
-                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle
-            elif angle > pi/2:
-                angle = pi - angle
-                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / angle    
 
             tempDict.update({IP:tempVal}) 
             tempList.append((IP,tempVal)) # TODO May not need list because it won't be sorted
@@ -80,6 +77,15 @@ class TravelingSalesmanMidpointAlgo:
         c = - (a * (leftOP[0]) + b * (leftOP[1]))
         # Finds shortest distance between IP and line created by OPs
         return abs((a * IP[0] + b * IP[1] + c)) / (a**2 + b**2)**.5
+
+    @staticmethod
+    def GetAngle(leftOP,midpoint,IP): # Find angle to order IP when one MP connects to multiple IP (Angle is from midpoint's perspective)
+        vector1 = (leftOP[0] - midpoint[0],leftOP[1] - midpoint[1])
+        vector2 = (IP[0] - midpoint[0],IP[1] - midpoint[1])
+
+        dotProduct = np.dot(vector1, vector2) 
+        normsProduct = (np.linalg.norm(vector1)*np.linalg.norm(vector2))
+        return np.arccos(dotProduct/normsProduct)
 
     def GetClosestIPs(self): # Gets smallest outer radius (from OP to IP)
         minVal = float('inf')
@@ -155,16 +161,7 @@ class TravelingSalesmanMidpointAlgo:
                 print('multi-case requiring recursion')
                 exit()
         print('IP:',len(self.convexHull.IP),'\n',self.convexHull.IP,'\n'*2)
-            
-    @staticmethod
-    def GetAngle(leftOP,midpoint,IP): # Find angle to order IP when one MP connects to multiple IP (Angle is from midpoint's perspective)
-        vector1 = (leftOP[0] - midpoint[0],leftOP[1] - midpoint[1])
-        vector2 = (IP[0] - midpoint[0],IP[1] - midpoint[1])
-
-        dotProduct = np.dot(vector1, vector2) 
-        normsProduct = (np.linalg.norm(vector1)*np.linalg.norm(vector2))
-        return np.arccos(dotProduct/normsProduct)
-    
+        
     def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree=None): #TODO Make into AVL tree
     # Uses binary tree to insert into linkedOP
         if i == 0:
