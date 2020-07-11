@@ -4,25 +4,39 @@ from link_nodes import LinkNodes
 
 
 class CreateConvexHull:
-    def __init__(self,pointNum,pointRange):
-        if isinstance(pointNum,list):
-            all(list(map(type,tup)) == [int,int] for tup in pointNum)
-        
-            allPoints = pointNum
+    def __init__(self,pointNum,pointRange,isConvexHull):
+        if isConvexHull == False:
+            if isinstance(pointNum,list) \
+               and all(list(map(type,tup)) == [int,int] for tup in pointNum):
+               
+                allPoints = pointNum
+            else:
+                try:
+                    pointNum = int(pointNum)
+                    pointRange = int(pointRange)
+                except:
+                    print("Both pointNum and pointRange must be integers,"
+                          " or enter pointNum as a list of (x,y) points with integer values")
+                    exit()
+                
+                print("pointNum:",pointNum)
+                print("pointRange:",pointRange,"\n"*2)
+                    
+                allPoints = self.GetRandomPoints(pointNum,pointRange)
+            self.SeparatePoints(allPoints)
         else:
-            try:
-                pointNum = int(pointNum)
-                pointRange = int(pointRange)
-            except:
-                print("pointNum and pointRange must be integers, or enter pointNum as a list of (x,y) points with integer values")
+            if isinstance(pointNum,list) and isinstance(pointRange,list)\
+               and all(list(map(type,tup)) == [float,float] for tup in pointNum) \
+               and all(list(map(type,tup)) == [float,float] for tup in pointRange):
+                
+                self.OP = pointNum
+                self.IP = pointRange
+            else:
+                print("If isConvexHull equals True, both pointNum and pointRange must be lists."
+                      " Specifically, pointNum should contain the points of the convex hull in counterclockwise order,"
+                      " and pointRange should be the interior points not part of the convex hull.")
                 exit()
             
-            print("pointNum:",pointNum)
-            print("pointRange:",pointRange,"\n"*2)
-                
-            allPoints = self.GetRandomPoints(pointNum,pointRange)
-        
-        self.SeparatePoints(allPoints)
         self.CreateLinkedList()
     
     def GetRandomPoints(self,pointNum,pointRange):
@@ -52,4 +66,4 @@ class CreateConvexHull:
         for i in range(len(self.OP)):
             self.linkedOP.update({self.OP[i] : LinkNodes(self.OP,i,self.midpointDict)})
         
-        print("midpointDict:",self.midpointDict,"\n"*2)
+        print("midpointDict:",self.midpointDict,"\n"*2)           
