@@ -6,7 +6,7 @@ import math
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
-    def __init__(self,pointNum,pointRange=15,isPointNumConvexHull=False):
+    def __init__(self,pointNum,pointRange=15,isPointNumConvexHull:bool=False):
         self.convexHull = CreateConvexHull(pointNum,pointRange,isPointNumConvexHull)
         print('linkedOP:',self.convexHull.linkedOP,'\n'*2)
         self.midpointsToIPs = {}
