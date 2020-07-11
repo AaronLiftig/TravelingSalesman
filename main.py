@@ -2,19 +2,12 @@ from convex_hull import CreateConvexHull
 from link_nodes import AddNode
 import time
 import numpy as np
-from math import inf as infinity, pi
-
-
-class TreeNode:
-    def __init__(self,angleIP):
-        self.point = angleIP
-        self.left = None
-        self.right = None
+import math
 
 # OP: Outer Points. IP: Inner Points.
 class TravelingSalesmanMidpointAlgo:
-    def __init__(self,pointNum,pointRange=15):
-        self.convexHull = CreateConvexHull(pointNum,pointRange)
+    def __init__(self,pointNum,pointRange=15,isPointNumConvexHull=False):
+        self.convexHull = CreateConvexHull(pointNum,pointRange,isPointNumConvexHull)
         print('linkedOP:',self.convexHull.linkedOP,'\n'*2)
         self.midpointsToIPs = {}
         self.midpointsToIPsRef = {}
@@ -52,9 +45,9 @@ class TravelingSalesmanMidpointAlgo:
             # Divides shortest distance between OPs line and IP by the angle created by the leftOP--midpoint--IP
             # May need to be a multiple of the angle or some other variation
             try:
-                tempVal = self.ShortestDistance(leftOP,rightOP,IP) / np.sin(angle)
+                tempVal = round(self.ShortestDistance(leftOP,rightOP,IP) / np.sin(angle),10)
             except ZeroDivisionError:    
-                tempVal = infinity # inf if IP is collinear to OPs
+                tempVal = math.inf # inf if IP is collinear to OPs
 
             tempDict.update({IP:tempVal}) 
             tempList.append((IP,tempVal)) # TODO May not need list because it won't be sorted
@@ -128,38 +121,48 @@ class TravelingSalesmanMidpointAlgo:
         except KeyError:
             self.IPToMidDict.update({IP:[(MP,Dist)]})
 
+    def UpdatePointsLists(self):
+        for IP in self.SetIP:
+            self.convexHull.OP.append(IP) 
+            self.convexHull.IP.remove(IP) 
+    
     def UpdateAllDicts(self):   
         usedDict = {} # Stops IPToMidDict (IP keys) from using same midpoint again
-        for NewIP,ListMP in self.IPToMidDict.items():
-            if len(ListMP)==1: # CASE: when an IP is only touched by one MP
-                MP = ListMP[0][0]
+        recursiveCase = []
+        for newIP,listMP in self.IPToMidDict.items():
+            if len(listMP)==1: # CASE1: when an IP is only touched by one MP
+                MP = listMP[0][0]
                 try:
                     usedDict[MP]  # Checks if midpoint is in used dictionary
                 except:
                     usedDict.update({MP:None})
                 else:
                     continue
-                ListIP = self.MidToIPDict[MP]
-                count = len(ListIP)
+                listIP = self.MidToIPDict[MP]
+                count = len(listIP)
                 tempOPsList = self.convexHull.midpointDict.pop(MP)
                 leftOfMid = tempOPsList[0]
                 rightOfMid = tempOPsList[1]
-                if count == 1: # CASE: when the MP touches one IP
-                    self.ConnectNewIPs(ListIP[0][0],leftOfMid,rightOfMid)
-                    self.DeleteFromDicts(MP,ListIP[0][0])
-                else: # CASE: when the MP touches multiple IP
+                if count == 1: # CASE1a: when the MP touches one IP
+                    self.ConnectNewIPs(listIP[0][0],leftOfMid,rightOfMid)
+                    self.DeleteFromDicts(MP,listIP[0][0])
+                else: # CASE1b: when the MP touches multiple IP
                     tree = None
                     for i in range(count):
-                        IP = ListIP[i]
+                        IP = listIP[i]
                         angle = self.GetAngle(leftOfMid,MP,IP[0])
                         tree = self.InsertIntoOPsTree((IP[0],angle),leftOfMid,rightOfMid,i,tree)
                         self.DeleteFromDicts(MP,IP[0])
-            else: # CASE: When multiple Midpoints touch the same IP
-                for point in ListMP:
+            else: # CASE2: When multiple Midpoints touch the same IP
+                recursiveCase.append((newIP,listMP)) # Resolves CASE2s after all CASE1s
+        
+        if len(recursiveCase) > 0: # Resolving CASE2s
+            print('multi-case requiring recursion')
+            for newIP,listMP in recursiveCase:
+                for MP in listMP:
+                    exit()
                     pass
-                
-                print('multi-case requiring recursion')
-                exit()
+
         print('IP:',len(self.convexHull.IP),'\n',self.convexHull.IP,'\n'*2)
         
     def InsertIntoOPsTree(self,angleIP,leftOP,rightOP,i,tree=None): #TODO Make into AVL tree
@@ -211,11 +214,6 @@ class TravelingSalesmanMidpointAlgo:
         self.AddToMidpointToIPs(newNode,'left')
         print('\n')
         
-    def UpdatePointsLists(self):
-        for IP in self.SetIP:
-            self.convexHull.OP.append(IP) 
-            self.convexHull.IP.remove(IP) 
-    
     def MultiCase(self):
         pass
     
@@ -231,10 +229,22 @@ class TravelingSalesmanMidpointAlgo:
                 printList.append(rightPoint)
         print('Path:',printList)
 
-TravelingSalesmanMidpointAlgo(15,15)
+class TreeNode:
+    def __init__(self,angleIP):
+        self.point = angleIP
+        self.left = None
+        self.right = None
+
+
+# TravelingSalesmanMidpointAlgo(15,15)
 
 # Simple test case:
-#TravelingSalesmanMidpointAlgo([(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1)]) 
+# TravelingSalesmanMidpointAlgo([(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1)]) 
+
+# Simple recursive case
+TravelingSalesmanMidpointAlgo([(-2.0, -15.0),(10.0, -13.0),(8.0, -4.0),(-6.0, 7.0),(-14.0, 12.0),(-14.0, 7.0),(-14.0, -4.0),(-6.0,-15.0)],
+                              [(0.0, 1.0),(-5.0, 2.0),(-4.0, 0.0),(-6.0, 4.0),(-4.0, -6.0),(-2.0, -13.0)],
+                              True) 
 
 # (Number of Points,Range of Points +/-) # Both integers
 
