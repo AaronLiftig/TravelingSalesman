@@ -100,7 +100,6 @@ class TravelingSalesmanSolution:
             distance_value = self.get_distance(IP,MP=self.get_MP(left_OP,
                                                                 right_OP),
                                                 metric=2)
-
         return distance_value
 
     @staticmethod
@@ -129,7 +128,7 @@ class TravelingSalesmanSolution:
         return np.arccos(dot_product/norms_product)
 
     @staticmethod
-    def get_MP(point1,point2): # get_MP Formula
+    def get_MP(point1,point2): # Midpoint Formula
         return ((point1[0]+point2[0])/2,(point1[1]+point2[1])/2)
 
     def get_closest_IPs(self): 
