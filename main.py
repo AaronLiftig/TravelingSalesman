@@ -42,6 +42,7 @@ class TravelingSalesmanSolution:
             self.print_connected_OP()
         else:
             self.convex_hull = _parent_object.convex_hull
+            #TODO Complete recurrsive case
         
     def get_MP_to_IPs(self): 
     # Gets all distances from each Midpoint to IP
