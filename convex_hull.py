@@ -4,66 +4,55 @@ from link_nodes import LinkNodes
 
 
 class CreateConvexHull:
-    def __init__(self,pointNum,pointRange,isConvexHull):
-        if isConvexHull == False:
-            if isinstance(pointNum,list) \
-               and all(list(map(type,tup)) == [int,int] for tup in pointNum):
-               
-                allPoints = pointNum
-            else:
-                try:
-                    pointNum = int(pointNum)
-                    pointRange = int(pointRange)
-                except:
-                    print("Both pointNum and pointRange must be integers,"
-                          " or enter pointNum as a list of (x,y) points with integer values")
+    def __init__(self,number_of_points,range_of_points,point_list):
+        if point_list is None and number_of_points is not None and range_of_points is not None:
+            try:
+                number_of_points = int(number_of_points)
+                range_of_points = int(range_of_points)
+                if number_of_points < 1 or range_of_points < 1:
+                    print("Both number_of_points and range_of_points must be positive integers,")
                     exit()
-                
-                print("pointNum:",pointNum)
-                print("pointRange:",pointRange,"\n"*2)
-                    
-                allPoints = self.GetRandomPoints(pointNum,pointRange)
-            self.SeparatePoints(allPoints)
-        else:
-            if isinstance(pointNum,list) and isinstance(pointRange,list)\
-               and all(list(map(type,tup)) == [float,float] for tup in pointNum) \
-               and all(list(map(type,tup)) == [float,float] for tup in pointRange):
-                
-                self.OP = pointNum
-                self.IP = pointRange
-            else:
-                print("If isConvexHull equals True, both pointNum and pointRange must be lists."
-                      " Specifically, pointNum should contain the points of the convex hull in counterclockwise order,"
-                      " and pointRange should be the interior points not part of the convex hull.")
+            except:
+                print("Both number_of_points and range_of_points must be positive integers,"
+                " or enter number_of_points as a list of (x,y) points with integer values")
                 exit()
-            
-        self.CreateLinkedList()
+            print("number_of_points:",number_of_points)
+            print("range_of_points:",range_of_points,"\n"*2)          
+            all_points = self.get_random_points(number_of_points,range_of_points)         
+        elif isinstance(point_list,list) and number_of_points is None and range_of_points is None \
+        and all(list(map(type,tup)) == [int,int] for tup in point_list):  
+            all_points = list(set(point_list))   
+        else:
+            print("Either point_list must be a list of integers or number_of_points and range_of_points must be positive integers")
+            exit()
+        self.separate_points(all_points)
+        self.create_linked_list()
     
-    def GetRandomPoints(self,pointNum,pointRange):
-        allPoints = [] 
+    def get_random_points(self,number_of_points,range_of_points):
+        all_points = [] 
 
-        for i in range(pointNum):
-            points = (float(np.random.randint(-pointRange,pointRange)),
-                        float(np.random.randint(-pointRange,pointRange)))
-            allPoints.append(points)
+        for i in range(number_of_points):
+            points = (float(np.random.randint(-range_of_points,range_of_points)),
+                        float(np.random.randint(-range_of_points,range_of_points)))
+            all_points.append(points)
         # creates list of random points
 
-        allPoints = list(set(allPoints)) #takes out possible duplicates
-        return allPoints
+        all_points = list(set(all_points)) #takes out possible duplicates
+        return all_points
 
-    def SeparatePoints(self,allPoints):    
-        print("allPoints:",allPoints,"\n")
+    def separate_points(self,all_points):    
+        print("all_points:",all_points,"\n")
         
-        self.OP = [allPoints[i] for i in ConvexHull(allPoints).vertices]
+        self.OP = [all_points[i] for i in ConvexHull(all_points).vertices]
         print("OP:",self.OP,"\n") # Prints points of convex hull (OP)
 
-        self.IP = [x for x in allPoints if x not in self.OP]
+        self.IP = [x for x in all_points if x not in self.OP]
         print("IP:",len(self.IP),"\n",self.IP,"\n"*2) # Prints all inner points (not in OP)
 
-    def CreateLinkedList(self):
-        self.linkedOP = {}
-        self.midpointDict = {} # For referencing efficency
+    def create_linked_list(self):
+        self.linked_OP = {}
+        self.MP_dictionary = {} # For referencing efficency
         for i in range(len(self.OP)):
-            self.linkedOP.update({self.OP[i] : LinkNodes(self.OP,i,self.midpointDict)})
+            self.linked_OP.update({self.OP[i] : LinkNodes(self.OP,i,self.MP_dictionary)})
         
-        print("midpointDict:",self.midpointDict,"\n"*2)           
+        print("MP_dictionary:",self.MP_dictionary,"\n"*2)           
