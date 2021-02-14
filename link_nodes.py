@@ -1,6 +1,8 @@
-# Will eventually not use only midpoint to account for issues with collinear points and other cases that do not work
+# Will eventually not use only midpoint to account for issues with
+# collinear points and other cases that do not work
 
-class LinkNodes: # Left and right are from perspective facing convex hull from outside
+class LinkNodes: 
+    # Left and right are from perspective facing convex hull from outside
     def __init__(self,array,i,MP_dictionary):
         self.point = array[i]
         self.left = array[(i-1)%len(array)] # Clockwise
