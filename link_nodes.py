@@ -23,7 +23,7 @@ class LinkNodes:
             MP_dictionary[self.right_MP] = [self.point] + MP_dictionary[self.right_MP]
 
     @staticmethod
-    def get_MP(point1,point2): # get_MP Formula
+    def get_MP(point1,point2): # Midpoint Formula
         return ((point1[0]+point2[0])/2,(point1[1]+point2[1])/2)
 
 
@@ -42,5 +42,5 @@ class AddNode:
         print("MP_dictionary:",MP_dictionary,"\n"*2)
 
     @staticmethod
-    def get_MP(point1,point2): # get_MP Formula
+    def get_MP(point1,point2): # Midpoint Formula
         return ((point1[0]+point2[0])/2,(point1[1]+point2[1])/2)
