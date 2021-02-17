@@ -25,7 +25,8 @@ class CreateConvexHull:
                                                 range_of_points)         
         elif isinstance(point_list,list) and number_of_points is None \
         and range_of_points is None \
-        and all(list(map(type,tup)) == [int,int] for tup in point_list):  
+        and (all(list(map(type,tup)) == [int,int] for tup in point_list)
+        or all(list(map(type,tup)) == [float,float] for tup in point_list)):  
             all_points = list(set(point_list))   
         else:
             print("Either point_list must be a list of integers or number_of_points" 
@@ -61,9 +62,9 @@ class CreateConvexHull:
 
     def create_linked_list(self):
         self.linked_OP = {}
-        self.MP_dictionary = {} # For referencing efficency
+        self.MP_to_OP_dictionary = {} # For referencing efficency
         for i in range(len(self.OP)):
-            self.linked_OP.update({self.OP[i] : LinkNodes(self.OP,i,
-                                                        self.MP_dictionary)})
+            self.linked_OP.update({self.OP[i]:LinkNodes(self.OP,i,
+                                                    self.MP_to_OP_dictionary)})
         
-        print("MP_dictionary:",self.MP_dictionary,"\n"*2)           
+        print("MP_to_OP_dictionary:",self.MP_to_OP_dictionary,"\n"*2)           

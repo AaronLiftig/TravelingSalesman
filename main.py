@@ -11,10 +11,10 @@ class TreeNode:
         self.left = None
         self.right = None
 
-# OP: Outer Points. IP: Inner Points. MP: Midpoint
+# OP: Outer Point(s). IP: Inner Point(s). MP: Midpoint(s)
 class TravelingSalesmanSolution:
     def __init__(self,number_of_points=None,range_of_points=None,
-                point_list=None,_parent_object=None,metric=1):
+                point_list=None,_parent_object=None,metric=2):
         if metric not in (1,2):
             print("Currently only two metric options exist."
                     + " Please choose 1 or 2.")
@@ -42,7 +42,9 @@ class TravelingSalesmanSolution:
             self.print_connected_OP()
         else:
             self.convex_hull = _parent_object.convex_hull
-            #TODO Complete recurrsive case
+            # _parent_object.get_closest_IPs()
+            # _parent_object.update_points_lists()
+            # _parent_object.update_all_dictionaries()
         
     def get_MP_to_IPs(self): 
     # Gets all distances from each Midpoint to IP
@@ -56,11 +58,11 @@ class TravelingSalesmanSolution:
         temp_list = []
         for IP in self.convex_hull.IP:
             if direction_string.lower() == 'right':
-                OPs = self.convex_hull.MP_dictionary[OP.right_MP]
+                OPs = self.convex_hull.MP_to_OP_dictionary[OP.right_MP]
                 left_OP,right_OP = OPs[0],OPs[1]
                 angle = self.get_angle(left_OP,OP.right_MP,IP)
             elif direction_string.lower() == 'left':
-                OPs = self.convex_hull.MP_dictionary[OP.left_MP]
+                OPs = self.convex_hull.MP_to_OP_dictionary[OP.left_MP]
                 left_OP,right_OP = OPs[0],OPs[1]
                 angle = self.get_angle(left_OP,OP.left_MP,IP)
 
@@ -199,7 +201,7 @@ class TravelingSalesmanSolution:
                     continue
                 IP_list = self.MP_to_IP_dictionary[MP]
                 count = len(IP_list)
-                temp_OPs_list = self.convex_hull.MP_dictionary.pop(MP)
+                temp_OPs_list = self.convex_hull.MP_to_OP_dictionary.pop(MP)
                 left_of_MP = temp_OPs_list[0]
                 right_of_MP = temp_OPs_list[1]
                 if count == 1: # CASE1a: when the MP touches one IP
@@ -267,7 +269,7 @@ class TravelingSalesmanSolution:
     
     def delete_from_dictionaries(self,MP,IP): 
     #TODO Find better way to prevent exceptions
-        for p in self.convex_hull.MP_dictionary.keys():
+        for p in self.convex_hull.MP_to_OP_dictionary.keys():
             if p == MP: # Is completely deleted directly after loop
                 continue
             try: 
@@ -286,7 +288,7 @@ class TravelingSalesmanSolution:
 
     def connect_new_IPs(self,IP,left_of_MP,right_of_MP):
         new_node = AddNode(IP,left_of_MP,right_of_MP,
-                            self.convex_hull.MP_dictionary)
+                            self.convex_hull.MP_to_OP_dictionary)
 
         # update linked_OP
         self.convex_hull.linked_OP[left_of_MP].right = IP
@@ -316,21 +318,30 @@ class TravelingSalesmanSolution:
             else:
                 right_point = self.convex_hull.linked_OP[right_point].right
                 print_list.append(right_point)
-        print('Path:',print_list)
+        print('Path:',print_list,'\n'*2)
 
+        self.get_final_distance(print_list)
 
-# Simple test case:
+    def get_final_distance(self,final_list):
+        total = 0
+        length = len(final_list)
+        for i in range(length):
+            j = (i+1) % length
+            total += self.get_distance(final_list[i],MP=final_list[j],metric=2)
+            # Calculating euclidean distance of final Path
+        print("Final Distance:",total)
+            
+
+"""Simple test case:"""
 TravelingSalesmanSolution(
-    point_list = [(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1)],
-    metric=2) 
+    point_list = [(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1),(1,3)],
+    metric=2
+   ) 
 
-# Simple recursive case:
+"""Simple recursive case:"""
 # TravelingSalesmanSolution(
-#     point_list = [(-2.0, -15.0),(10.0, -13.0),(8.0, -4.0),(-6.0, 7.0),
-#         (-14.0, 12.0),(-14.0, 7.0),(-14.0, -4.0),(-6.0,-15.0),
-#         (0.0, 1.0),(-5.0, 2.0),(-4.0, 0.0),(-6.0, 4.0),(-4.0, -6.0),
-#         (-2.0, -13.0)]
+#     point_list = [(10,0),(0,10),(0,-10),(-10,0),(5,0),(2,1)]
 #     ) 
 
-# Number of Points,Range of Points must both be positive integers
+"""Number of Points,Range of Points must both be positive integers"""
 #TravelingSalesmanSolution(number_of_points=15,range_of_points=25)
