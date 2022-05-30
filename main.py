@@ -1,4 +1,4 @@
-from convex_hull import CreateConvexHull
+from convex_hull import ConvexHull_
 from link_nodes import AddNode
 from recursive_case import RecursiveCase
 import time
@@ -13,8 +13,18 @@ class TreeNode:
 
 # OP: Outer Point(s). IP: Inner Point(s). MP: Midpoint(s)
 class TravelingSalesmanSolution:
-    def __init__(self,number_of_points=None,range_of_points=None,
-                point_list=None,_parent_object=None,metric=2):
+    def __init__(self, number_of_points=None, range_of_points=None,
+                point_list=None, _parent_object=None, metric=2):
+        
+        self.validate_metric(metric)
+
+        if _parent_object is None:
+            self.run_non_recursive_case(number_of_points, range_of_points, 
+                                        point_list)
+        else:
+            self.run_recursive_case(_parent_object)
+        
+    def validate_metric(self, metric):
         if metric not in (1,2):
             print("Currently only two metric options exist."
                     + " Please choose 1 or 2.")
@@ -22,38 +32,49 @@ class TravelingSalesmanSolution:
         else:
             self.metric = metric
 
-        if _parent_object is None:
-            self.convex_hull = CreateConvexHull(number_of_points,
+    @staticmethod
+    def get_convex_hull(number_of_points, range_of_points, point_list):
+        return ConvexHull_(number_of_points, range_of_points, point_list)
+
+    def connect_IP(self):
+        while len(self.convex_hull.IP) != 0:
+            self.get_closest_IPs()
+            self.update_points_lists()
+            self.update_all_dictionaries()
+
+    def run_non_recursive_case(self, number_of_points, range_of_points, 
+                                point_list):
+        self.convex_hull = self.get_convex_hull(number_of_points,
                                                 range_of_points,
                                                 point_list)
-            print('linked_OP:',self.convex_hull.linked_OP,'\n'*2)
-            
-            self.MP_to_IPs = {}
-            self.MP_to_IPs_reference = {}
-            self.get_MP_to_IPs()
 
-            begin = time.time()
-            while len(self.convex_hull.IP) != 0:
-                self.get_closest_IPs()
-                self.update_points_lists()
-                self.update_all_dictionaries()
-            end = time.time()
-            print('Time:',end - begin,'\n'*2)
-            self.print_connected_OP()
-        else:
-            self.convex_hull = _parent_object.convex_hull
+        print('linked_OP:',self.convex_hull.linked_OP,'\n'*2)
+        
+        self.MP_to_IP_distances = {}
+        self.MP_to_IP_distances_reference = {}
+        self.get_MP_to_IP_distances()
+
+        begin = time.time()
+        self.connect_IP()
+        end = time.time()
+        
+        print('Time:',end - begin,'\n'*2)
+        self.print_connected_OP()
+
+    def run_recursive_case(self, _parent_object):
+        self.convex_hull = _parent_object.convex_hull
             # _parent_object.get_closest_IPs()
             # _parent_object.update_points_lists()
             # _parent_object.update_all_dictionaries()
-        
-    def get_MP_to_IPs(self): 
-    # Gets all distances from each Midpoint to IP
-        print('MP_to_IPs:','\n')
-        for OP in self.convex_hull.linked_OP.items():
-            self.add_to_MP_to_IPs(OP[1],'right')
-        print('\n')
 
-    def add_to_MP_to_IPs(self,OP,direction_string):
+    def get_MP_to_IP_distances(self): 
+    # Gets all distances from each Midpoint to IP
+        print('MP_to_IP_distances:\n')
+        for OP in self.convex_hull.linked_OP.items():
+            self.add_to_MP_to_IP_distances(OP[1],'right')
+        print()
+
+    def add_to_MP_to_IP_distances(self,OP,direction_string):
         temp_dictionary = {}
         temp_list = []
         for IP in self.convex_hull.IP:
@@ -79,14 +100,14 @@ class TravelingSalesmanSolution:
         # TODO Don't sort. Always put min(s) at the front of lists
         if direction_string.lower() == 'right':    
             print(OP.right_MP,':',temp_list,'\n')
-            self.MP_to_IPs_reference.update({OP.right_MP:temp_dictionary}) 
-            # Used as reference to delete from MP_to_IPs
-            self.MP_to_IPs.update({OP.right_MP:temp_list})
+            self.MP_to_IP_distances_reference.update({OP.right_MP:temp_dictionary}) 
+            # Used as reference to delete from MP_to_IP_distances
+            self.MP_to_IP_distances.update({OP.right_MP:temp_list})
         elif direction_string.lower() == 'left':
             print(OP.left_MP,':',temp_list,'\n')
-            self.MP_to_IPs_reference.update({OP.left_MP:temp_dictionary}) 
-            # Used as reference to delete from MP_to_IPs
-            self.MP_to_IPs.update({OP.left_MP:temp_list})
+            self.MP_to_IP_distances_reference.update({OP.left_MP:temp_dictionary}) 
+            # Used as reference to delete from MP_to_IP_distances
+            self.MP_to_IP_distances.update({OP.left_MP:temp_list})
 
     def metric_function(self,left_OP,right_OP,IP,angle,metric):
         if metric == 1:
@@ -140,7 +161,7 @@ class TravelingSalesmanSolution:
         self.MP_to_IP_dictionary = {}
         self.IP_to_MP_dictionary = {}
         self.IP_set = set()
-        for k,v in self.MP_to_IPs.items():
+        for k,v in self.MP_to_IP_distances.items():
             if v[0][1] == minimum_distance:
                 self.check_for_multi_connection_case(k,v,minimum_distance)
             elif v[0][1] < minimum_distance:
@@ -273,16 +294,16 @@ class TravelingSalesmanSolution:
             if p == MP: # Is completely deleted directly after loop
                 continue
             try: 
-                distance_reference = self.MP_to_IPs_reference[p][IP]
+                distance_reference = self.MP_to_IP_distances_reference[p][IP]
             except:
                 continue
-            self.MP_to_IPs[p].remove((IP,distance_reference)) 
-            # Deletes new IP from MP_to_IPs
+            self.MP_to_IP_distances[p].remove((IP,distance_reference)) 
+            # Deletes new IP from MP_to_IP_distances
 
-            del self.MP_to_IPs_reference[p][IP] 
-            # Deletes new IP from MP_to_IPs_reference
+            del self.MP_to_IP_distances_reference[p][IP] 
+            # Deletes new IP from MP_to_IP_distances_reference
         try:
-            del self.MP_to_IPs[MP] # Deletes entire MP case
+            del self.MP_to_IP_distances[MP] # Deletes entire MP case
         except:
             pass
 
@@ -299,11 +320,11 @@ class TravelingSalesmanSolution:
 
         print('linked_OP:',self.convex_hull.linked_OP,'\n'*2)
 
-        # update MP_to_IPs
-        print('New MP_to_IPs:','\n')
-        self.add_to_MP_to_IPs(new_node,'right')
-        self.add_to_MP_to_IPs(new_node,'left')
-        print('\n')
+        # update MP_to_IP_distances
+        print('New MP_to_IP_distances:\n')
+        self.add_to_MP_to_IP_distances(new_node,'right')
+        self.add_to_MP_to_IP_distances(new_node,'left')
+        print()
         
     def multi_case(self):
         pass
@@ -332,16 +353,20 @@ class TravelingSalesmanSolution:
         print("Final Distance:",total)
             
 
-"""Simple test case:"""
-TravelingSalesmanSolution(
-    point_list = [(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1),(1,3)],
-    metric=2
-   ) 
+if __name__ == "__main__":
+    """Simple test case:"""
+    TravelingSalesmanSolution(
+        point_list = [(-2,2),(2,2),(-2,-10),(2,-10),(-1,1),(1,1),(1,3)],
+        metric=2
+    ) 
 
-"""Simple recursive case:"""
-# TravelingSalesmanSolution(
-#     point_list = [(10,0),(0,10),(0,-10),(-10,0),(5,0),(2,1)]
-#     ) 
+    """Simple recursive case:"""
+    # TravelingSalesmanSolution(
+    #     point_list = [(10,0),(0,10),(0,-10),(-10,0),(5,0),(2,1)]
+    # ) 
 
-"""Number of Points,Range of Points must both be positive integers"""
-#TravelingSalesmanSolution(number_of_points=15,range_of_points=25)
+    """
+    Random point selection:
+    (Number of Points,Range of Points must both be positive integers)
+    """
+    #TravelingSalesmanSolution(number_of_points=15,range_of_points=25)

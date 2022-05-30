@@ -9,7 +9,7 @@ MP = Midpoints (midpoints of the OP)
 
 This algorithm is a modified greedy algorithm. 
 
-The user can use the metrics paramteter to select from two different metrics to calculate the next shortest distance. 
+The user can use the metrics parameter to select from two different metrics to calculate the next shortest distance. 
 - Metric 1 is the shortest distance from any IP to all infinitely extended OP edges, divided by sine of the angle from the respective MP to the IP.
 - Metric 2 is the euclidean distance between an MP to an IP
 - More metrics to come...
@@ -34,15 +34,15 @@ The idea is similar to ideas found in the following links:
       1. Connect the new IP(s) via the OP(s) that share the MP(s) that made contact.
       2. Repeat steps 1 through 3 for all newly created MPs.
    4. ELSE IF the shortest distance is one or many MP connecting multiple, **non-distinct** (shared) IP:
-      1. Treat all such IP as tempory virtual connections.
+      1. Treat all such IP as temporary virtual connections.
       2. Have **simultaneous** recursions for each virtual connection occurring, yield their next shortest distance until one prevails.
       3. The winning virtual connection is kept and others are disregarded.
-         1. Use information from virtual connection to save compuation time.
+         1. Use information from virtual connection to save computation time.
          2. In cases where IP are eliminated before a winning virtual connection is found, there are multiple shortest path solutions.
 
 
 ### Additional Notes:
-The current version does not have a working version of the **non-distinct** cases. All other aspects of the algorithm are functioning as written, though it may still require tweeking, particularly the metrics.
+The current version does not have a working version of the **non-distinct** cases. All other aspects of the algorithm are functioning as written, though it may still require tweaking, particularly the metrics.
 
 ### The questions that I seek to answer are:
 - What are the upper and lower bounds (or best and worst cases) of this algorithm's time complexity?

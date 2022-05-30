@@ -1,8 +1,5 @@
-# Will eventually not use only midpoint to account for issues with
-# collinear points and other cases that do not work
-
 class LinkNodes: 
-    # Left and right are from perspective facing convex hull from outside
+    # Left is clockwise
     def __init__(self,array,i,MP_to_OP_dictionary):
         self.point = array[i]
         self.left = array[(i-1)%len(array)] # Clockwise

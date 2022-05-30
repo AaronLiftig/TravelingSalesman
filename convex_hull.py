@@ -3,10 +3,10 @@ import numpy as np
 from link_nodes import LinkNodes
 
 
-class CreateConvexHull:
+class ConvexHull_:
     def __init__(self,number_of_points,range_of_points,point_list):
-        if point_list is None and number_of_points is not None \
-        and range_of_points is not None:
+        if (point_list is None and number_of_points is not None
+            and range_of_points is not None):
             try:
                 number_of_points = int(number_of_points)
                 range_of_points = int(range_of_points)
@@ -14,7 +14,7 @@ class CreateConvexHull:
                     print("Both number_of_points and range_of_points" 
                         + " must be positive integers,")
                     exit()
-            except:
+            except ValueError:
                 print("Both number_of_points and range_of_points must" 
                     + " be positive integers, or enter number_of_points" 
                     + " as a list of (x,y) points with integer values")
