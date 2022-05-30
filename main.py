@@ -310,7 +310,6 @@ class TravelingSalesmanSolution:
     def connect_new_IPs(self,IP,left_of_MP,right_of_MP):
         new_node = AddNode(IP,left_of_MP,right_of_MP,
                             self.convex_hull.MP_to_OP_dictionary)
-
         # update linked_OP
         self.convex_hull.linked_OP[left_of_MP].right = IP
         self.convex_hull.linked_OP[left_of_MP].right_MP = new_node.left_MP
