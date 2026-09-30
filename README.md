@@ -1,60 +1,98 @@
 # Traveling Salesman Lab
 
-An interactive browser implementation of a convex-hull insertion approach to the Euclidean Traveling Salesman Problem (TSP). It lets you watch points being incorporated into an initial convex-hull tour, compare three geometric selection metrics, and compare the resulting tour with an exact Held–Karp solution for small point sets.
+An interactive browser implementation of a convex-hull insertion approach to the Euclidean Traveling Salesman Problem (TSP).
 
-## Live demo
+The application lets you watch points being incorporated into an initial convex-hull tour, compare three geometric selection metrics, and compare the resulting tour with an exact Held–Karp solution for small point sets.
 
-Enable **GitHub Pages** for this repository and the project runs directly from `index.html`. No server, package manager, bundler, or external JavaScript library is required.
+## Live Demo
 
-## What it does
+**[Open the Traveling Salesman Lab](https://aaronliftig.github.io/TravelingSalesman/)**
 
-The algorithm starts with the convex hull of the generated points. Interior points are then evaluated against the current tour edges and inserted according to the selected geometric metric. The application records each insertion so the process can be played, paused, stepped through, and reset.
+The project runs entirely in the browser. No server, package manager, bundler, or external JavaScript library is required.
 
-The right-hand comparison uses an exact Held–Karp dynamic-programming solution for point sets of up to 20 points. This provides a ground truth for investigating where the geometric heuristic matches the optimum and where it diverges.
+## What It Does
 
-## Geometric metrics
+The algorithm starts with the convex hull of the generated points. Interior points are then evaluated against the current tour edges and inserted according to the selected geometric metric.
 
-### 1. Angle-adjusted line distance
+The application records each insertion so the process can be:
 
-For an internal point `P` and an outer edge `AB`, first calculate the perpendicular distance from `P` to the infinitely extended line through `A` and `B`. That distance is then divided by the sine of the angle measured at the edge midpoint between the direction toward an endpoint and the direction toward `P`.
+* played
+* paused
+* stepped through
+* reset
+* compared against the exact solution
 
-This is the angle-adjusted geometric measure used by the original project. When the sine approaches zero, the metric is treated as infinite.
+The interface also provides side-by-side comparisons of the different insertion strategies and the resulting tour lengths.
 
-### 2. Midpoint distance
+## Geometric Metrics
 
-Let `M` be the midpoint of edge `AB`. The score is the Euclidean distance from `P` to `M`:
+### 1. Angle-Adjusted Line Distance
 
-`d(P,M) = sqrt((Px-Mx)^2 + (Py-My)^2)`
+For an internal point `P` and an outer edge `AB`, the algorithm first calculates the perpendicular distance from `P` to the infinitely extended line through `A` and `B`.
 
-### 3. Shortest segment distance
+That distance is then divided by the sine of the angle measured at the edge midpoint between the direction toward an endpoint and the direction toward `P`.
 
-This additional metric measures the shortest Euclidean distance from `P` to **any point on the finite segment `AB`**. It does not restrict the closest point to the midpoint. The perpendicular projection is calculated and clamped to the segment endpoints when necessary.
+This is the angle-adjusted geometric measure used by the original project.
 
-## Comparing the heuristic with the optimum
+When the sine approaches zero, the metric is treated as infinite.
+
+### 2. Midpoint Distance
+
+Let `M` be the midpoint of edge `AB`.
+
+The score is the Euclidean distance from `P` to `M`:
+
+```text
+d(P,M) = sqrt((Px-Mx)² + (Py-My)²)
+```
+
+### 3. Shortest Segment Distance
+
+This metric measures the shortest Euclidean distance from `P` to any point on the finite segment `AB`.
+
+Unlike midpoint distance, it does not restrict the closest point to the midpoint.
+
+The perpendicular projection is calculated and clamped to the segment endpoints when necessary.
+
+## Comparing the Heuristic With the Optimum
 
 For small point sets, the application calculates:
 
-- heuristic tour length
-- exact optimal tour length
-- excess tour length
-- optimality gap
-- whether the tour has the same length as the optimum
-- insertion count
-- measured execution time
+* heuristic tour length
+* exact optimal tour length
+* excess tour length
+* optimality gap
+* whether the heuristic tour has the same length as the optimum
+* insertion count
+* measured execution time
 
 The optimality gap is:
 
-`(heuristic length - optimal length) / optimal length`
+```text
+(heuristic length - optimal length) / optimal length
+```
 
-The exact solver is intentionally limited to 20 points because Held–Karp grows exponentially with the number of points.
+The exact solver is intentionally limited to 20 points because the Held–Karp algorithm grows exponentially with the number of points.
 
-## Investigating where the heuristic works
+## Investigating Where the Heuristic Works
 
-The application is intended not only as a TSP solver demonstration but also as an experimental tool for studying the geometry of the insertion process. In particular, point sets can be constructed or generated with different interior structures—such as simple inroads, multiple competing inroads, nested structures, clusters, and adversarial arrangements—and compared against the exact solution.
+The application is intended not only as a TSP solver demonstration, but also as an experimental tool for studying the geometry of the insertion process.
 
-A useful question is whether the quality of the resulting tour depends systematically on the depth and interaction of these interior structures.
+Point sets can be generated or constructed with different interior structures, including:
 
-## Project structure
+* simple inroads
+* multiple competing inroads
+* nested structures
+* clusters
+* adversarial arrangements
+
+These can then be compared against the exact solution.
+
+A central question is whether the quality of the resulting tour depends systematically on the depth and interaction of these interior structures.
+
+## Project Structure
+
+The application is intentionally split into small browser-native JavaScript modules. The modules are loaded directly by the browser in dependency order, so no bundler or build system is required.
 
 ```text
 .
@@ -64,16 +102,22 @@ A useful question is whether the quality of the resulting tour depends systemati
 │   ├── css/
 │   │   └── style.css
 │   └── js/
-│       └── app.js
+│       ├── geometry.js    # distance, cross product, convex hull, route length
+│       ├── generator.js   # seeded point generation
+│       ├── metrics.js     # three geometric insertion metrics
+│       ├── solver.js      # convex-hull insertion heuristic
+│       ├── exact.js       # Held–Karp exact solver
+│       ├── renderer.js    # canvas visualization
+│       └── ui.js          # controls, animation, statistics, event log
 └── docs/
     └── (space for future documentation)
 ```
 
-## Running locally
+## Running Locally
 
-Open `index.html` directly in a modern browser. The application has no external dependencies.
+Because the application uses browser-native JavaScript modules, it is best run through a local static server.
 
-For local development, a simple static server can also be used, for example:
+For example:
 
 ```bash
 python -m http.server
@@ -81,39 +125,29 @@ python -m http.server
 
 Then open the local address shown by Python.
 
+You can also run the project through GitHub Pages:
+
+**https://aaronliftig.github.io/TravelingSalesman/**
+
 ## GitHub Pages
 
-1. Push the contents of this directory to the repository.
-2. In GitHub, open **Settings → Pages**.
-3. Select **Deploy from a branch**.
-4. Select the branch containing `index.html` and the `/ (root)` folder.
-5. Save.
+The project is deployed directly from the repository using GitHub Pages.
 
-Because the project is entirely static, no build command is required.
+To configure Pages for a new copy of the project:
+
+1. Push the project files to the repository.
+2. Open **Settings → Pages**.
+3. Select **Deploy from a branch**.
+4. Select the branch containing `index.html`.
+5. Select `/ (root)` as the folder.
+6. Save.
+
+No build command is required.
 
 ## Background
 
-The project is based on the repository's convex-hull/midpoint insertion approach to the Euclidean TSP. The original repository describes the method as a modified greedy approach that uses convex-hull edges and their midpoints to guide the insertion of interior points.
+The project is based on the repository's convex-hull/midpoint insertion approach to the Euclidean TSP.
 
-This browser version makes the process visual and provides an exact comparison for small instances so that the heuristic can be studied rather than treated as an assumed optimal algorithm.
+The original method is a modified greedy approach that uses convex-hull edges and their midpoints to guide the insertion of interior points.
 
-
-## Project structure
-
-The application is intentionally split into small browser-native JavaScript modules (loaded as ordered scripts, not bundled):
-
-```text
-assets/
-├── css/
-│   └── style.css
-└── js/
-    ├── geometry.js    # distance, cross product, convex hull, route length
-    ├── generator.js   # seeded point generation
-    ├── metrics.js     # the three geometric insertion metrics
-    ├── solver.js      # convex-hull insertion heuristic
-    ├── exact.js       # Held–Karp exact solver
-    ├── renderer.js    # canvas visualization
-    └── ui.js          # controls, animation, statistics, event log
-```
-
-This keeps the project easy to inspect and modify while remaining directly deployable to GitHub Pages without npm, a bundler, or a server.
+This browser implementation makes the process visual and provides an exact comparison for small instances, allowing the heuristic to be investigated experimentally rather than assumed to be optimal.
