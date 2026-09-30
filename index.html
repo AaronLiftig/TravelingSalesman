@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Traveling Salesman Lab — Convex Hull Insertion</title>
+<link rel="stylesheet" href="assets/css/style.css"></head><body>
+<header><div><h1>Traveling Salesman Lab</h1><div class="sub">Browser-based · dependency-free · GitHub Pages ready</div></div><div class="sub">Convex hull insertion · geometric metrics · exact comparison</div></header>
+<main><aside>
+<section><label>Points: <span id="pointsVal">12</span></label><input id="points" type="range" min="3" max="20" value="12">
+<label>Metric</label><select id="metric"></select><div class="formula" id="formula"></div><div class="desc" id="metricDescription"></div>
+<div class="desc">Algorithm: convex hull → globally shortest current metric → insert the selected inner point(s). Equal connections to the same edge are ordered by angle.</div>
+<label>Seed</label><input id="seed" type="number" value="1"><div class="grid2"><button class="primary" id="run">Generate &amp; Run</button><button id="random">Random Seed</button></div></section>
+<section><label>Playback speed</label><input id="speed" type="range" min="1" max="100" value="45"><div class="grid2"><button id="pause">Pause</button><button id="step">Step</button></div><button id="reset">Reset Animation</button></section>
+<section class="cards">
+<div class="card"><small>Heuristic route</small><b id="yourLength">—</b></div><div class="card"><small>Exact route</small><b id="exactLength">—</b></div>
+<div class="card"><small>Extra length</small><b id="extra">—</b></div><div class="card"><small>Optimality gap</small><b id="gap">—</b></div>
+<div class="card"><small>Heuristic runtime</small><b id="yourTime">—</b></div><div class="card"><small>Exact runtime</small><b id="exactTime">—</b></div>
+<div class="card"><small>Runtime ratio</small><b id="timeRatio">—</b></div><div class="card"><small>Insertion steps</small><b id="stepCount">—</b></div>
+<div class="card"><small>Same tour?</small><b id="sameRoute">—</b></div><div class="card"><small>Same length?</small><b id="sameLength">—</b></div>
+</section>
+<section><label>Event log</label><div class="log" id="log"></div></section>
+<section class="note">Exact comparison uses Held–Karp and is limited to 20 points because its cost grows exponentially. No external libraries, imports, servers, or build step are required.</section>
+</aside>
+<div class="stage"><div class="panel"><h2>Convex Hull Insertion</h2><canvas id="yourCanvas"></canvas><div class="status" id="yourStatus">Ready</div></div>
+<div class="panel"><h2>Exact Held–Karp</h2><canvas id="exactCanvas"></canvas><div class="status" id="exactStatus">Ready</div></div></div></main>
+<script src="assets/js/geometry.js"></script>
+<script src="assets/js/generator.js"></script>
+<script src="assets/js/metrics.js"></script>
+<script src="assets/js/solver.js"></script>
+<script src="assets/js/exact.js"></script>
+<script src="assets/js/renderer.js"></script>
+<script src="assets/js/ui.js"></script></body></html>
