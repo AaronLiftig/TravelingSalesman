@@ -13,4 +13,16 @@ function routeLength(route,points){
   let s=0;for(let i=0;i<route.length;i++)s+=distance(points[route[i]],points[route[(i+1)%route.length]]);
   return s;
 }
-
+// True when two closed tours visit the points in the same cyclic order,
+// allowing a different starting point and either direction of travel.
+function sameTour(a,b){
+  if(a.length!==b.length)return false;
+  const n=a.length;if(!n)return true;
+  const pos=b.indexOf(a[0]);if(pos<0)return false;
+  let fwd=true,bwd=true;
+  for(let i=0;i<n&&(fwd||bwd);i++){
+    if(a[i]!==b[(pos+i)%n])fwd=false;
+    if(a[i]!==b[(pos-i+n)%n])bwd=false;
+  }
+  return fwd||bwd;
+}

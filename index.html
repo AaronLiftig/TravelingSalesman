@@ -2,29 +2,57 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Traveling Salesman Lab — Convex Hull Insertion</title>
 <link rel="stylesheet" href="assets/css/style.css"></head><body>
-<header><div><h1>Traveling Salesman Lab</h1><div class="sub">Browser-based · dependency-free · GitHub Pages ready</div></div><div class="sub">Convex hull insertion · geometric metrics · exact comparison</div></header>
+<header><div><h1>Traveling Salesman Lab</h1><div class="sub">Browser-based · dependency-free · GitHub Pages ready</div></div><div class="sub">Vacuum-sealing film · earlier metrics · exact optimum</div></header>
 <main><aside>
-<section><label>Points: <span id="pointsVal">12</span></label><input id="points" type="range" min="3" max="20" value="12">
-<label>Metric</label><select id="metric"></select><div class="formula" id="formula"></div><div class="desc" id="metricDescription"></div>
-<div class="desc">Algorithm: convex hull → globally shortest current metric → insert the selected inner point(s). Equal connections to the same edge are ordered by angle.</div>
-<label>Seed</label><input id="seed" type="number" value="1"><div class="grid2"><button class="primary" id="run">Generate &amp; Run</button><button id="random">Random Seed</button></div></section>
-<section><label>Playback speed</label><input id="speed" type="range" min="1" max="100" value="45"><div class="grid2"><button id="pause">Pause</button><button id="step">Step</button></div><button id="reset">Reset Animation</button></section>
-<section class="cards">
-<div class="card"><small>Heuristic route</small><b id="yourLength">—</b></div><div class="card"><small>Exact route</small><b id="exactLength">—</b></div>
-<div class="card"><small>Extra length</small><b id="extra">—</b></div><div class="card"><small>Optimality gap</small><b id="gap">—</b></div>
-<div class="card"><small>Heuristic runtime</small><b id="yourTime">—</b></div><div class="card"><small>Exact runtime</small><b id="exactTime">—</b></div>
-<div class="card"><small>Runtime ratio</small><b id="timeRatio">—</b></div><div class="card"><small>Insertion steps</small><b id="stepCount">—</b></div>
-<div class="card"><small>Same tour?</small><b id="sameRoute">—</b></div><div class="card"><small>Same length?</small><b id="sameLength">—</b></div>
+<section>
+<label for="points">Points</label>
+<div class="points-row"><input id="pointsRange" type="range" min="3" max="200" value="12" aria-label="Points slider"><input id="points" type="number" min="3" max="20" step="1" value="12" inputmode="numeric"></div>
+<div class="estimate" id="estimate" aria-live="polite"></div>
+<div class="estimate hint" id="runHint" hidden>Larger than the auto-run size. Press <b>Generate &amp; Solve</b> to run.</div>
+<div class="label-row"><label id="metricsLabel">Metrics</label><span class="links"><button type="button" class="link" id="selectAll">All</button><button type="button" class="link" id="selectNone">None</button></span></div>
+<div class="metric-list" id="metricList" role="group" aria-labelledby="metricsLabel"></div>
+<label for="display">Display</label>
+<select id="display"><option value="all">All Selected</option><option value="best">Best Selected</option><option value="one">One Selected</option></select>
+<select id="displayOne" aria-label="Metric to display" hidden></select>
+<div class="desc">Algorithm: convex hull → globally shortest current metric → insert the selected inner point(s). Equal connections to the same edge are ordered by angle. Every selected metric runs independently on the same points.</div>
+<label for="seed">Seed</label><input id="seed" type="number" value="1">
+<div class="grid2"><button class="primary" id="run">Generate &amp; Solve</button><button id="random">Random Seed</button></div>
+<div class="warning" id="warning" hidden><p id="warningText"></p><div class="grid2"><button class="primary" id="runAnyway">Run anyway</button><button id="cancelWarning">Cancel</button></div></div>
 </section>
+<section><label for="speed">Playback speed</label><input id="speed" type="range" min="1" max="100" value="45"><div class="grid2"><button id="playPause">Play</button><button id="step">Step</button></div><div class="grid2"><button id="reset">Reset Animation</button><button id="skip">Skip to End</button></div></section>
+<section class="cards">
+<div class="card"><small>Exact route</small><b id="exactLength">—</b></div><div class="card"><small>Exact runtime</small><b id="exactTime">—</b></div>
+<div class="card"><small>Points</small><b id="pointCount">—</b></div><div class="card"><small>Hull points</small><b id="hullCount">—</b></div>
+</section>
+<section><label>Ranking</label><table class="ranking" id="ranking"><tbody></tbody></table></section>
 <section><label>Event log</label><div class="log" id="log"></div></section>
-<section class="note">Exact comparison uses Held–Karp and is limited to 20 points because its cost grows exponentially. No external libraries, imports, servers, or build step are required.</section>
+<section class="note">Every run is compared against the exact optimum from Held–Karp. Its cost grows exponentially, so the point limit is the largest size it can solve in about 10 s on this device, measured at startup (typically 20–22 points). No external libraries, imports, servers, or build step are required.</section>
 </aside>
-<div class="stage"><div class="panel"><h2>Convex Hull Insertion</h2><canvas id="yourCanvas"></canvas><div class="status" id="yourStatus">Ready</div></div>
-<div class="panel"><h2>Exact Held–Karp</h2><canvas id="exactCanvas"></canvas><div class="status" id="exactStatus">Ready</div></div></div></main>
+<div class="stage">
+<div class="progress" id="progress" role="status" aria-live="polite" hidden>
+<div class="progress-head"><b>Computing…</b><button type="button" id="cancelRun">Cancel</button></div>
+<div class="progress-sub" id="progressSub"></div>
+<div class="bar"><span id="progressBar"></span></div>
+<ul id="progressList"></ul>
+</div>
+<div class="legend" aria-label="Legend">
+<span><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="3" fill="#e8edf5"/></svg>Point</span>
+<span><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="#ff8a3d" stroke="#0c1016" stroke-width="1.2"/></svg>Point being inserted</span>
+<span><svg viewBox="0 0 12 12"><path d="M6 2 10 6 6 10 2 6Z" fill="none" stroke="#f6c453" stroke-width="1.5"/></svg>Hull edge midpoint (Midpoint and Trig-Adjusted only)</span>
+<span><svg viewBox="0 0 16 12"><path d="M2 10Q8 0 14 10" fill="none" stroke="#b18cff" stroke-width="1.6"/></svg>Vacuum contact arc</span>
+<span><svg viewBox="0 0 16 12"><path d="M1 6H15" stroke="#596678" stroke-width="2"/></svg>Convex hull</span>
+<span><svg viewBox="0 0 16 12"><path d="M1 6H15" stroke="#4f86ff" stroke-width="2.5"/></svg>Heuristic tour</span>
+<span><svg viewBox="0 0 16 12"><path d="M1 6H15" stroke="#58c7a5" stroke-width="2.5"/></svg>Optimal tour</span>
+</div>
+<div class="results" id="results"></div>
+<div class="empty" id="empty" hidden>Select at least one metric to run.</div>
+</div></main>
 <script src="assets/js/geometry.js"></script>
 <script src="assets/js/generator.js"></script>
 <script src="assets/js/metrics.js"></script>
+<script src="assets/js/vacuum.js"></script>
 <script src="assets/js/solver.js"></script>
 <script src="assets/js/exact.js"></script>
+<script src="assets/js/scheduler.js"></script>
 <script src="assets/js/renderer.js"></script>
 <script src="assets/js/ui.js"></script></body></html>
